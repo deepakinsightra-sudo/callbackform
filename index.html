@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Vachana Client Enquiry</title>
-<link rel="stylesheet" href="https://script.google.com/macros/s/AKfycbyMF9SMuI8bAwrknlYka7HNzY-Z2_LW9f4Ej-yg55iL29JhZqHFRo3iqIQoMwnMkq57BA/exec">
 <style>
 /* Layout: one question per screen, left-aligned, a thin brass progress line on top, Back and hints pinned below. */
 :root {
@@ -199,7 +198,7 @@ tbody tr:last-child td { border-bottom: 0; }
     <section class="screen" id="welcome">
       <img class="logo logo-lg" src="logo.jpg" alt="" width="120" height="120">
       <p class="kicker">Client Details</p>
-      <h1>Help us serve you better.</h1>
+      <h1>Help us to serve you better.</h1>
       <p class="lead">Three short questions. It takes about a minute.</p>
       <p class="privacy">Your privacy matters to us. Everything you share stays strictly confidential and is used only for internal purposes to understand your financial goals and journey, so that we can serve you better.</p>
       <div class="actions">
@@ -226,7 +225,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
       <div class="screen" data-step="2" hidden>
         <label class="q-label" for="f-services"><span class="q-count">3 of 3</span>What services do you expect from us?</label>
-        <p class="q-help">For example investments, insurance, retirement planning or tax planning.</p>
+        <p class="q-help">For example Investments, Stock Market Courses, Insurance, Retirement planning or Mutual Fund.</p>
         <textarea class="field" id="f-services" name="services" rows="3" placeholder="Type your answer here" aria-describedby="e-services"></textarea>
         <p class="error" id="e-services" role="alert"></p>
         <div class="actions"><button type="button" class="btn" data-next id="submit">Submit</button><span class="hint"><kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span></div>
@@ -236,7 +235,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
     <section class="screen" id="done" hidden tabindex="-1">
       <h2>Thank you for your response.</h2>
-      <p class="lead">Our team will get back to you.</p>
+      <p class="lead">Your response has been sent. Our team will get back to you.</p>
     </section>
 
   </main>
@@ -249,8 +248,8 @@ tbody tr:last-child td { border-bottom: 0; }
 
 <script>
 (function () {
-  /* Paste the Google Apps Script Web app URL between the quotes (it ends in /exec). */
-  var SHEET_URL = '';
+  /* Deployed Google Apps Script web app URL. Update this if you create a new deployment. */
+  var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxva2jS9Zol0XTYcQHccRqpsL_WLl6oTJ1PMBUIIh5X9wW88MzsScNBOi5hvKlyYdDhsA/exec';
 
   var els = {
     welcome: document.getElementById('welcome'),
@@ -352,14 +351,14 @@ tbody tr:last-child td { border-bottom: 0; }
           name: v.name, phone: v.phone, services: v.services,
           'bot-field': trap ? trap.value : ''
         });
-        /* no-cors: the browser cannot read Google's reply, so a finished request counts as sent */
+        /* Google Apps Script uses cross-origin redirects. In no-cors mode the server result cannot be verified here. */
         await fetch(SHEET_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: body.toString()
         });
-        saved = true;
+        saved = true; // Request dispatched, but not proof of a saved Sheet row.
       }
     } catch (e) {
       saved = false;
