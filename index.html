@@ -226,7 +226,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
       <div class="screen" data-step="2" hidden>
         <label class="q-label" for="f-services"><span class="q-count">3 of 3</span>What services do you expect from us?</label>
-        <p class="q-help">For example Investments, Stock Market Courses, Insurance, Retirement planning or Mutual funds.</p>
+        <p class="q-help">For example investments, insurance, retirement planning or tax planning.</p>
         <textarea class="field" id="f-services" name="services" rows="3" placeholder="Type your answer here" aria-describedby="e-services"></textarea>
         <p class="error" id="e-services" role="alert"></p>
         <div class="actions"><button type="button" class="btn" data-next id="submit">Submit</button><span class="hint"><kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span></div>
@@ -235,18 +235,10 @@ tbody tr:last-child td { border-bottom: 0; }
     </form>
 
     <section class="screen" id="done" hidden tabindex="-1">
-      <p class="kicker">Received</p>
-      <h2 id="done-title">Thank you.</h2>
-      <p class="lead">Your details have been received. We will use them to understand your goals and serve you better.</p>
+      <h2>Thank you for your response.</h2>
+      <p class="lead">Our team will get back to you.</p>
     </section>
 
-    <section class="screen" id="fallback" hidden tabindex="-1">
-      <p class="kicker">Not sent yet</p>
-      <h2>We could not save your response here.</h2>
-      <p class="lead">Please copy the text below and send it to your Vachana contact. Nothing has been lost.</p>
-      <textarea class="summary" id="summary" readonly aria-label="Your responses"></textarea>
-      <div class="actions"><button type="button" class="btn" id="copy">Copy my responses</button><span class="hint" id="copy-note" role="status"></span></div>
-    </section>
   </main>
 
   <footer class="bottom">
@@ -264,7 +256,6 @@ tbody tr:last-child td { border-bottom: 0; }
     welcome: document.getElementById('welcome'),
     form: document.getElementById('form'),
     done: document.getElementById('done'),
-    fallback: document.getElementById('fallback'),
     responses: document.getElementById('responses'),
     bar: document.getElementById('bar'),
     progress: document.getElementById('progress'),
@@ -298,7 +289,6 @@ tbody tr:last-child td { border-bottom: 0; }
     cur = i;
     els.welcome.hidden = true;
     els.done.hidden = true;
-    els.fallback.hidden = true;
     if (els.responses) els.responses.hidden = true;
     els.form.hidden = false;
     steps.forEach(function (s, k) { s.hidden = k !== i; });
@@ -315,7 +305,6 @@ tbody tr:last-child td { border-bottom: 0; }
     els.welcome.hidden = true;
     els.form.hidden = true;
     els.done.hidden = true;
-    els.fallback.hidden = true;
     if (els.responses) els.responses.hidden = true;
     el.hidden = false;
     els.back.hidden = true;
@@ -343,26 +332,10 @@ tbody tr:last-child td { border-bottom: 0; }
     };
   }
 
-  function summaryText(v) {
-    return [
-      'Vachana Investments: client details',
-      'Name: ' + v.name,
-      'Phone: ' + v.phone,
-      'Services expected: ' + v.services
-    ].join('\n');
-  }
-
-  function thanks(v) {
-    var first = v.name.split(/\s+/)[0] || '';
-    document.getElementById('done-title').textContent = first ? 'Thank you, ' + first + '.' : 'Thank you.';
+  function thanks() {
     els.bar.style.width = '100%';
     els.progress.setAttribute('aria-valuenow', '100');
     showOnly(els.done);
-  }
-
-  function fallback(v) {
-    document.getElementById('summary').value = summaryText(v);
-    showOnly(els.fallback);
   }
 
   async function submit() {
@@ -394,7 +367,13 @@ tbody tr:last-child td { border-bottom: 0; }
     sending = false;
     btn.disabled = false;
     btn.textContent = 'Submit';
-    if (saved) { thanks(v); } else { fallback(v); }
+    if (saved) {
+      thanks();
+    } else {
+      if (!SHEET_URL) console.error('SHEET_URL is empty: paste the Apps Script Web app URL at the top of the script.');
+      errs[cur].textContent = 'We could not send your response. Please check your connection and try again.';
+      fields[cur].focus();
+    }
   }
 
   document.getElementById('start').addEventListener('click', function () { showStep(0, 'fwd'); });
@@ -419,15 +398,6 @@ tbody tr:last-child td { border-bottom: 0; }
     if (e.key === 'Enter' && cur === -1 && !els.welcome.hidden && document.activeElement === document.body) {
       showStep(0, 'fwd');
     }
-  });
-
-  document.getElementById('copy').addEventListener('click', function () {
-    var box = document.getElementById('summary');
-    var note = document.getElementById('copy-note');
-    function select() { box.focus(); box.select(); note.textContent = 'Text selected. Press Ctrl+C or Cmd+C to copy.'; }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(box.value).then(function () { note.textContent = 'Copied.'; }, select);
-    } else { select(); }
   });
 
   setProgress(-1);
