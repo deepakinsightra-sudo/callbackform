@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Vachana Client Enquiry</title>
+
 <style>
-/* Layout: one question per screen, left-aligned, a thin brass progress line on top, Back and hints pinned below. */
 :root {
   --bg: #F2F4F8;
   --surface: #FFFFFF;
@@ -20,6 +20,7 @@
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
   --font-body: "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0A1A30;
@@ -31,9 +32,10 @@
     --brass-fill: #D2AC58;
     --on-brass: #0A1A30;
     --error: #F0948F;
-    colour-scheme: dark;
+    color-scheme: dark;
   }
 }
+
 :root[data-theme="dark"] {
   --bg: #0A1A30;
   --surface: #11264A;
@@ -44,11 +46,18 @@
   --brass-fill: #D2AC58;
   --on-brass: #0A1A30;
   --error: #F0948F;
-  colour-scheme: dark;
+  color-scheme: dark;
 }
 
-* { box-sizing: border-box; }
-html, body { height: 100%; }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -60,6 +69,7 @@ body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
+
 .app {
   height: 100%;
   max-width: 720px;
@@ -68,11 +78,44 @@ body {
   flex-direction: column;
 }
 
-.top { padding-top: 18px; display: flex; flex-direction: column; gap: 14px; }
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand-text { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; flex: 1; min-width: 0; }
-.logo { width: 52px; height: 52px; border-radius: 50%; flex: none; display: block; box-shadow: 0 0 0 1px var(--line); }
-.logo-lg { width: 120px; height: 120px; margin-bottom: 26px; }
+.top {
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex: none;
+  display: block;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.logo-lg {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 26px;
+}
+
 .brand-name {
   font-family: var(--font-display);
   font-weight: 600;
@@ -80,17 +123,65 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.brand-tag { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.06em; }
-.progress { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
-.progress > span { display: block; height: 100%; width: 0; background: var(--brass-fill); transition: width 0.4s ease; }
 
-main { flex: 1; min-height: 0; display: flex; padding-block: 24px; overflow-y: auto; }
-main > .screen, #form { margin-block: auto; }
-#form { width: 100%; }
-.screen { width: 100%; animation: rise 0.35s ease both; }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.brand-tag {
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
 
-h1, h2, .q-label {
+.progress {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--brass-fill);
+  transition: width 0.4s ease;
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding-block: 24px;
+  overflow-y: auto;
+}
+
+main > .screen,
+#form {
+  margin-block: auto;
+}
+
+#form {
+  width: 100%;
+}
+
+.screen {
+  width: 100%;
+  animation: rise 0.35s ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+h1,
+h2,
+.q-label {
   font-family: var(--font-display);
   font-weight: 400;
   line-height: 1.15;
@@ -98,14 +189,51 @@ h1, h2, .q-label {
   text-wrap: balance;
   margin: 0;
 }
-h1 { font-size: clamp(2rem, 7vw, 3.1rem); }
-h2 { font-size: clamp(1.7rem, 5.5vw, 2.5rem); }
-.lead { max-width: 52ch; color: var(--muted); margin: 18px 0 0; }
-.kicker { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 700; margin: 0 0 14px; }
 
-.q-label { display: block; font-size: clamp(1.55rem, 5.2vw, 2.3rem); }
-.q-count { display: block; font-family: var(--font-body); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 700; margin-bottom: 12px; }
-.q-help { color: var(--muted); margin: 10px 0 0; font-size: 0.95rem; }
+h1 {
+  font-size: clamp(2rem, 7vw, 3.1rem);
+}
+
+h2 {
+  font-size: clamp(1.7rem, 5.5vw, 2.5rem);
+}
+
+.lead {
+  max-width: 52ch;
+  color: var(--muted);
+  margin: 18px 0 0;
+}
+
+.kicker {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.q-label {
+  display: block;
+  font-size: clamp(1.55rem, 5.2vw, 2.3rem);
+}
+
+.q-count {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.q-help {
+  color: var(--muted);
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+}
 
 .field {
   display: block;
@@ -123,13 +251,41 @@ h2 { font-size: clamp(1.7rem, 5.5vw, 2.5rem); }
   outline: none;
   transition: border-color 0.2s;
 }
-.field::placeholder { color: var(--muted); opacity: 0.6; }
-.field:focus { border-bottom-color: var(--brass-fill); }
-textarea.field { resize: none; min-height: 7.5rem; font-size: clamp(1.1rem, 3.8vw, 1.45rem); }
-.field[aria-invalid="true"] { border-bottom-color: var(--error); }
-.error { color: var(--error); font-size: 0.92rem; min-height: 1.4em; margin: 8px 0 0; }
 
-.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 22px; }
+.field::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.field:focus {
+  border-bottom-color: var(--brass-fill);
+}
+
+textarea.field {
+  resize: none;
+  min-height: 7.5rem;
+  font-size: clamp(1.1rem, 3.8vw, 1.45rem);
+}
+
+.field[aria-invalid="true"] {
+  border-bottom-color: var(--error);
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.92rem;
+  min-height: 1.4em;
+  margin: 8px 0 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 22px;
+}
+
 .btn {
   appearance: none;
   border: 0;
@@ -144,263 +300,979 @@ textarea.field { resize: none; min-height: 7.5rem; font-size: clamp(1.1rem, 3.8v
   cursor: pointer;
   transition: filter 0.15s, transform 0.15s;
 }
-.btn:hover { filter: brightness(1.07); }
-.btn:active { transform: translateY(1px); }
-.btn[disabled] { opacity: 0.6; cursor: default; }
-.btn-quiet { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-.hint { font-size: 0.85rem; color: var(--muted); }
-kbd { font-family: var(--font-body); font-size: 0.8rem; border: 1px solid var(--line); border-radius: 3px; padding: 1px 6px; }
-:focus-visible { outline: 2px solid var(--brass-fill); outline-offset: 3px; }
-.field:focus-visible { outline: none; }
 
-.privacy { margin-top: 28px; padding-left: 14px; border-left: 3px solid var(--brass-fill); max-width: 54ch; color: var(--muted); font-size: 0.95rem; }
+.btn:hover {
+  filter: brightness(1.07);
+}
 
-.bottom { padding-bottom: 16px; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-quiet {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+kbd {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass-fill);
+  outline-offset: 3px;
+}
+
+.field:focus-visible {
+  outline: none;
+}
+
+.privacy {
+  margin-top: 28px;
+  padding-left: 14px;
+  border-left: 3px solid var(--brass-fill);
+  max-width: 54ch;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.bottom {
+  padding-bottom: 16px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .link {
-  appearance: none; background: none; border: 0; padding: 8px 0; color: var(--muted);
-  font-family: var(--font-body); font-size: 0.95rem; cursor: pointer;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
 }
-.link:hover { color: var(--ink); }
 
-.summary { margin-top: 22px; width: 100%; min-height: 9rem; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 12px; font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; resize: vertical; }
+.link:hover {
+  color: var(--ink);
+}
 
-.table-wrap { margin-top: 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
-table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 0.92rem; }
-th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
-th { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-tbody tr:last-child td { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
-  .screen { animation: none; }
-  .progress > span { transition: none; }
-}
-@media (max-width: 480px) {
-  .btn { width: 100%; }
-  .hint { display: none; }
-}
-[hidden] { display: none !important; }
-</style>
+  .screen {
+    animation: none;
+  }
 
+  .progress > span {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100%;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
+</style>
 </head>
+
 <body>
+
 <div class="app">
+
   <header class="top">
+
     <div class="brand">
-      <img class="logo" src="logo.jpg" alt="Vachana Investments logo" width="52" height="52">
+
+      <img
+        class="logo"
+        src="logo.jpg"
+        alt="Vachana Investments logo"
+        width="52"
+        height="52"
+      >
+
       <div class="brand-text">
-        <span class="brand-name">Vachana Investments Pvt Ltd</span>
-        <span class="brand-tag">Confidentiality · Integrity · Precision</span>
+
+        <span class="brand-name">
+          Vachana Investments Pvt Ltd
+        </span>
+
+        <span class="brand-tag">
+          Confidentiality · Integrity · Precision
+        </span>
+
       </div>
+
     </div>
-    <div class="progress" role="progressbar" aria-label="Form progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><span id="bar"></span></div>
+
+    <div
+      class="progress"
+      role="progressbar"
+      aria-label="Form progress"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      id="progress"
+    >
+      <span id="bar"></span>
+    </div>
+
   </header>
 
   <main>
-    <section class="screen" id="welcome">
-      <img class="logo logo-lg" src="logo.jpg" alt="" width="120" height="120">
-      <p class="kicker">Client Details</p>
-      <h1>Help us to serve you better.</h1>
-      <p class="lead">Three short questions. It takes about a minute.</p>
-      <p class="privacy">Your privacy matters to us. Everything you share stays strictly confidential and is used only for internal purposes to understand your financial goals and journey, so that we can serve you better.</p>
+
+    <section
+      class="screen"
+      id="welcome"
+    >
+
+      <img
+        class="logo logo-lg"
+        src="logo.jpg"
+        alt=""
+        width="120"
+        height="120"
+      >
+
+      <p class="kicker">
+        Client Details
+      </p>
+
+      <h1>
+        Help us to serve you better.
+      </h1>
+
+      <p class="lead">
+        Three short questions. It takes about a minute.
+      </p>
+
+      <p class="privacy">
+        Your privacy matters to us. Everything you share stays strictly
+        confidential and is used only for internal purposes to understand
+        your financial goals and journey, so that we can serve you better.
+      </p>
+
       <div class="actions">
-        <button type="button" class="btn" id="start">Start</button>
-        <span class="hint">press <kbd>Enter</kbd></span>
+
+        <button
+          type="button"
+          class="btn"
+          id="start"
+        >
+          Start
+        </button>
+
+        <span class="hint">
+          press <kbd>Enter</kbd>
+        </span>
+
       </div>
+
     </section>
 
-    <form id="form" novalidate autocomplete="on" hidden>
-      <p hidden><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
-      <div class="screen" data-step="0" hidden>
-        <label class="q-label" for="f-name"><span class="q-count">1 of 3</span>What is your name?</label>
-        <input class="field" id="f-name" name="name" type="text" autocomplete="name" placeholder="Type your full name" aria-describedby="e-name">
-        <p class="error" id="e-name" role="alert"></p>
-        <div class="actions"><button type="button" class="btn" data-next>OK</button><span class="hint">press <kbd>Enter</kbd></span></div>
+
+    <form
+      id="form"
+      novalidate
+      autocomplete="on"
+      hidden
+    >
+
+      <p hidden>
+        <label>
+          Leave this empty
+
+          <input
+            name="bot-field"
+            tabindex="-1"
+            autocomplete="off"
+          >
+        </label>
+      </p>
+
+
+      <div
+        class="screen"
+        data-step="0"
+        hidden
+      >
+
+        <label
+          class="q-label"
+          for="f-name"
+        >
+          <span class="q-count">
+            1 of 3
+          </span>
+
+          What is your name?
+        </label>
+
+        <input
+          class="field"
+          id="f-name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          placeholder="Type your full name"
+          aria-describedby="e-name"
+        >
+
+        <p
+          class="error"
+          id="e-name"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+          >
+            OK
+          </button>
+
+          <span class="hint">
+            press <kbd>Enter</kbd>
+          </span>
+
+        </div>
+
       </div>
 
-      <div class="screen" data-step="1" hidden>
-        <label class="q-label" for="f-phone"><span class="q-count">2 of 3</span>What is your phone number?</label>
-        <input class="field" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+91 98450 00000" aria-describedby="e-phone">
-        <p class="error" id="e-phone" role="alert"></p>
-        <div class="actions"><button type="button" class="btn" data-next>OK</button><span class="hint">press <kbd>Enter</kbd></span></div>
+
+      <div
+        class="screen"
+        data-step="1"
+        hidden
+      >
+
+        <label
+          class="q-label"
+          for="f-phone"
+        >
+
+          <span class="q-count">
+            2 of 3
+          </span>
+
+          What is your phone number?
+
+        </label>
+
+        <input
+          class="field"
+          id="f-phone"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="+91 98450 00000"
+          aria-describedby="e-phone"
+        >
+
+        <p
+          class="error"
+          id="e-phone"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+          >
+            OK
+          </button>
+
+          <span class="hint">
+            press <kbd>Enter</kbd>
+          </span>
+
+        </div>
+
       </div>
 
-      <div class="screen" data-step="2" hidden>
-        <label class="q-label" for="f-services"><span class="q-count">3 of 3</span>What services do you expect from us?</label>
-        <p class="q-help">For example Investments, Stock Market Courses, Insurance, Retirement planning or Mutual Fund.</p>
-        <textarea class="field" id="f-services" name="services" rows="3" placeholder="Type your answer here" aria-describedby="e-services"></textarea>
-        <p class="error" id="e-services" role="alert"></p>
-        <div class="actions"><button type="button" class="btn" data-next id="submit">Submit</button><span class="hint"><kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span></div>
+
+      <div
+        class="screen"
+        data-step="2"
+        hidden
+      >
+
+        <label
+          class="q-label"
+          for="f-services"
+        >
+
+          <span class="q-count">
+            3 of 3
+          </span>
+
+          What services do you expect from us?
+
+        </label>
+
+        <p class="q-help">
+          For example Investments, Stock Market Courses, Insurance,
+          Retirement planning or Mutual Fund.
+        </p>
+
+        <textarea
+          class="field"
+          id="f-services"
+          name="services"
+          rows="3"
+          placeholder="Type your answer here"
+          aria-describedby="e-services"
+        ></textarea>
+
+        <p
+          class="error"
+          id="e-services"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+            id="submit"
+          >
+            Submit
+          </button>
+
+          <span class="hint">
+            <kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line
+          </span>
+
+        </div>
+
       </div>
 
     </form>
 
-    <section class="screen" id="done" hidden tabindex="-1">
-      <h2>Thank you for your response.</h2>
-      <p class="lead">Your response has been sent. Our team will get back to you.</p>
+
+    <section
+      class="screen"
+      id="done"
+      hidden
+      tabindex="-1"
+    >
+
+      <h2>
+        Thank you for your response.
+      </h2>
+
+      <p class="lead">
+        Your response has been sent.
+        Our team will get back to you.
+      </p>
+
     </section>
 
   </main>
 
+
   <footer class="bottom">
-    <button type="button" class="link" id="back" hidden>← Back</button>
+
+    <button
+      type="button"
+      class="link"
+      id="back"
+      hidden
+    >
+      ← Back
+    </button>
+
     <span></span>
+
   </footer>
+
 </div>
+
 
 <script>
 (function () {
-  /* Deployed Google Apps Script web app URL. Update this if you create a new deployment. */
-  var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxva2jS9Zol0XTYcQHccRqpsL_WLl6oTJ1PMBUIIh5X9wW88MzsScNBOi5hvKlyYdDhsA/exec';
 
   var els = {
-    welcome: document.getElementById('welcome'),
-    form: document.getElementById('form'),
-    done: document.getElementById('done'),
-    responses: document.getElementById('responses'),
-    bar: document.getElementById('bar'),
-    progress: document.getElementById('progress'),
-    back: document.getElementById('back')
+    welcome: document.getElementById("welcome"),
+    form: document.getElementById("form"),
+    done: document.getElementById("done"),
+    bar: document.getElementById("bar"),
+    progress: document.getElementById("progress"),
+    back: document.getElementById("back")
   };
-  var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]'));
-  var fields = ['f-name', 'f-phone', 'f-services'].map(function (id) { return document.getElementById(id); });
-  var errs = ['e-name', 'e-phone', 'e-services'].map(function (id) { return document.getElementById(id); });
+
+
+  var steps = Array.prototype.slice.call(
+    document.querySelectorAll("[data-step]")
+  );
+
+
+  var fields = [
+    "f-name",
+    "f-phone",
+    "f-services"
+  ].map(function (id) {
+    return document.getElementById(id);
+  });
+
+
+  var errs = [
+    "e-name",
+    "e-phone",
+    "e-services"
+  ].map(function (id) {
+    return document.getElementById(id);
+  });
+
+
   var cur = -1;
   var sending = false;
 
+
   var checks = [
-    function (v) { return v.trim().length >= 2 ? '' : 'Please enter your name.'; },
-    function (v) {
-      var digits = v.replace(/\D/g, '');
-      if (!/^[+\d][\d\s\-()]*$/.test(v.trim()) || digits.length < 7 || digits.length > 15) {
-        return 'Please enter a valid phone number, for example +91 98450 00000.';
-      }
-      return '';
+
+    function (value) {
+
+      return value.trim().length >= 2
+        ? ""
+        : "Please enter your name.";
+
     },
-    function (v) { return v.trim().length >= 3 ? '' : 'Please tell us what you expect from us.'; }
+
+
+    function (value) {
+
+      var digits = value.replace(/\D/g, "");
+
+      if (
+        !/^[+\d][\d\s\-()]*$/.test(value.trim()) ||
+        digits.length < 10 ||
+        digits.length > 15
+      ) {
+
+        return "Please enter a valid phone number, for example +91 98450 00000.";
+
+      }
+
+      return "";
+
+    },
+
+
+    function (value) {
+
+      return value.trim().length >= 3
+        ? ""
+        : "Please tell us what you expect from us.";
+
+    }
+
   ];
 
-  function setProgress(i) {
-    var pct = i < 0 ? 0 : Math.round((i / steps.length) * 100);
-    els.bar.style.width = pct + '%';
-    els.progress.setAttribute('aria-valuenow', String(pct));
+
+  function setProgress(index) {
+
+    var percent =
+      index < 0
+        ? 0
+        : Math.round((index / steps.length) * 100);
+
+    els.bar.style.width = percent + "%";
+
+    els.progress.setAttribute(
+      "aria-valuenow",
+      String(percent)
+    );
+
   }
 
-  function showStep(i, dir) {
-    cur = i;
+
+  function showStep(index, direction) {
+
+    cur = index;
+
     els.welcome.hidden = true;
     els.done.hidden = true;
-    if (els.responses) els.responses.hidden = true;
     els.form.hidden = false;
-    steps.forEach(function (s, k) { s.hidden = k !== i; });
-    els.back.hidden = i === 0;
-    setProgress(i);
-    var f = fields[i];
-    try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); }
-    if (f.setSelectionRange && f.type === 'text' && dir === 'back') {
-      var len = f.value.length; f.setSelectionRange(len, len);
+
+    steps.forEach(function (step, key) {
+
+      step.hidden = key !== index;
+
+    });
+
+
+    els.back.hidden = index === 0;
+
+    setProgress(index);
+
+
+    var field = fields[index];
+
+    try {
+
+      field.focus({
+        preventScroll: true
+      });
+
+    } catch (error) {
+
+      field.focus();
+
     }
+
+
+    if (
+      field.setSelectionRange &&
+      field.type === "text" &&
+      direction === "back"
+    ) {
+
+      var length = field.value.length;
+
+      field.setSelectionRange(
+        length,
+        length
+      );
+
+    }
+
   }
 
-  function showOnly(el) {
+
+  function showOnly(element) {
+
     els.welcome.hidden = true;
     els.form.hidden = true;
     els.done.hidden = true;
-    if (els.responses) els.responses.hidden = true;
-    el.hidden = false;
+
+    element.hidden = false;
+
     els.back.hidden = true;
-    try { el.focus({ preventScroll: true }); } catch (e) {}
+
+    try {
+
+      element.focus({
+        preventScroll: true
+      });
+
+    } catch (error) {}
+
   }
 
-  function validate(i) {
-    var msg = checks[i](fields[i].value);
-    errs[i].textContent = msg;
-    if (msg) { fields[i].setAttribute('aria-invalid', 'true'); } else { fields[i].removeAttribute('aria-invalid'); }
-    return !msg;
+
+  function validate(index) {
+
+    var message =
+      checks[index](
+        fields[index].value
+      );
+
+    errs[index].textContent =
+      message;
+
+
+    if (message) {
+
+      fields[index].setAttribute(
+        "aria-invalid",
+        "true"
+      );
+
+    } else {
+
+      fields[index].removeAttribute(
+        "aria-invalid"
+      );
+
+    }
+
+
+    return !message;
+
   }
+
 
   function next() {
-    if (sending || cur < 0) return;
-    if (!validate(cur)) { fields[cur].focus(); return; }
-    if (cur < steps.length - 1) { showStep(cur + 1, 'fwd'); } else { submit(); }
+
+    if (
+      sending ||
+      cur < 0
+    ) {
+      return;
+    }
+
+
+    if (!validate(cur)) {
+
+      fields[cur].focus();
+
+      return;
+
+    }
+
+
+    if (
+      cur <
+      steps.length - 1
+    ) {
+
+      showStep(
+        cur + 1,
+        "fwd"
+      );
+
+    } else {
+
+      submit();
+
+    }
+
   }
+
 
   function values() {
+
     return {
-      name: fields[0].value.trim(),
-      phone: fields[1].value.trim(),
-      services: fields[2].value.trim()
+
+      name:
+        fields[0].value.trim(),
+
+      phone:
+        fields[1].value.trim(),
+
+      services:
+        fields[2].value.trim()
+
     };
+
   }
+
 
   function thanks() {
-    els.bar.style.width = '100%';
-    els.progress.setAttribute('aria-valuenow', '100');
-    showOnly(els.done);
+
+    els.bar.style.width =
+      "100%";
+
+    els.progress.setAttribute(
+      "aria-valuenow",
+      "100"
+    );
+
+    showOnly(
+      els.done
+    );
+
   }
+
 
   async function submit() {
-    var v = values();
-    var btn = document.getElementById('submit');
+
+    var valuesObject =
+      values();
+
+
+    var button =
+      document.getElementById(
+        "submit"
+      );
+
+
+    var trap =
+      document.querySelector(
+        'input[name="bot-field"]'
+      );
+
+
     sending = true;
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
-    var saved = false;
+
+    button.disabled = true;
+
+    button.textContent =
+      "Sending…";
+
+
     try {
-      if (SHEET_URL) {
-        var trap = document.querySelector('input[name="bot-field"]');
-        var body = new URLSearchParams({
-          name: v.name, phone: v.phone, services: v.services,
-          'bot-field': trap ? trap.value : ''
-        });
-        /* Google Apps Script uses cross-origin redirects. In no-cors mode the server result cannot be verified here. */
-        await fetch(SHEET_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: body.toString()
-        });
-        saved = true; // Request dispatched, but not proof of a saved Sheet row.
+
+      /*
+       * IMPORTANT:
+       *
+       * Browser sends the lead only to our Netlify Function.
+       *
+       * The browser never receives or knows:
+       *
+       * CRM_WEBHOOK_SECRET
+       * LEAD_WEBHOOK_SECRET
+       * Supabase service role key
+       *
+       * Netlify Function securely forwards it to Vachana CRM.
+       */
+
+      var response =
+        await fetch(
+          "/.netlify/functions/submit-lead",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                name:
+                  valuesObject.name,
+
+                phone:
+                  valuesObject.phone,
+
+                services:
+                  valuesObject.services,
+
+                "bot-field":
+                  trap
+                    ? trap.value
+                    : ""
+              })
+          }
+        );
+
+
+      var result = {};
+
+      try {
+
+        result =
+          await response.json();
+
+      } catch (error) {
+
+        result = {};
+
       }
-    } catch (e) {
-      saved = false;
-    }
-    sending = false;
-    btn.disabled = false;
-    btn.textContent = 'Submit';
-    if (saved) {
+
+
+      if (
+        !response.ok ||
+        result.success !== true
+      ) {
+
+        throw new Error(
+          result.message ||
+          "Submission failed"
+        );
+
+      }
+
+
       thanks();
-    } else {
-      if (!SHEET_URL) console.error('SHEET_URL is empty: paste the Apps Script Web app URL at the top of the script.');
-      errs[cur].textContent = 'We could not send your response. Please check your connection and try again.';
+
+
+    } catch (error) {
+
+      console.error(
+        "Lead submission failed"
+      );
+
+
+      errs[cur].textContent =
+        "We could not send your response. Please check your connection and try again.";
+
+
       fields[cur].focus();
+
+
+    } finally {
+
+      sending = false;
+
+      button.disabled = false;
+
+      button.textContent =
+        "Submit";
+
     }
+
   }
 
-  document.getElementById('start').addEventListener('click', function () { showStep(0, 'fwd'); });
-  steps.forEach(function (s) {
-    s.querySelector('[data-next]').addEventListener('click', next);
-  });
-  els.back.addEventListener('click', function () { if (cur > 0) showStep(cur - 1, 'back'); });
 
-  fields.forEach(function (f, i) {
-    f.addEventListener('input', function () {
-      if (f.getAttribute('aria-invalid')) { validate(i); }
-    });
-    f.addEventListener('keydown', function (e) {
-      if (e.key !== 'Enter' || e.isComposing) return;
-      if (f.tagName === 'TEXTAREA' && e.shiftKey) return;
-      e.preventDefault();
-      next();
-    });
-  });
+  document
+    .getElementById("start")
+    .addEventListener(
+      "click",
+      function () {
 
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && cur === -1 && !els.welcome.hidden && document.activeElement === document.body) {
-      showStep(0, 'fwd');
+        showStep(
+          0,
+          "fwd"
+        );
+
+      }
+    );
+
+
+  steps.forEach(
+    function (step) {
+
+      step
+        .querySelector(
+          "[data-next]"
+        )
+        .addEventListener(
+          "click",
+          next
+        );
+
     }
-  });
+  );
+
+
+  els.back.addEventListener(
+    "click",
+    function () {
+
+      if (
+        cur > 0
+      ) {
+
+        showStep(
+          cur - 1,
+          "back"
+        );
+
+      }
+
+    }
+  );
+
+
+  fields.forEach(
+    function (
+      field,
+      index
+    ) {
+
+      field.addEventListener(
+        "input",
+        function () {
+
+          if (
+            field.getAttribute(
+              "aria-invalid"
+            )
+          ) {
+
+            validate(
+              index
+            );
+
+          }
+
+        }
+      );
+
+
+      field.addEventListener(
+        "keydown",
+        function (event) {
+
+          if (
+            event.key !==
+              "Enter" ||
+            event.isComposing
+          ) {
+
+            return;
+
+          }
+
+
+          if (
+            field.tagName ===
+              "TEXTAREA" &&
+            event.shiftKey
+          ) {
+
+            return;
+
+          }
+
+
+          event.preventDefault();
+
+          next();
+
+        }
+      );
+
+    }
+  );
+
+
+  document.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (
+        event.key ===
+          "Enter" &&
+        cur === -1 &&
+        !els.welcome.hidden &&
+        document.activeElement ===
+          document.body
+      ) {
+
+        showStep(
+          0,
+          "fwd"
+        );
+
+      }
+
+    }
+  );
+
 
   setProgress(-1);
+
 })();
 </script>
+
 </body>
 </html>
