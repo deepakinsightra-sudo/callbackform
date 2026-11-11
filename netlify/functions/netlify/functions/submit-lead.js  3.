@@ -110,11 +110,15 @@ export async function handler(event) {
     }
 
     function text(value, maxLength) {
-      if (typeof value !== "string") return "";
+      if (typeof value !== "string") {
+        return "";
+      }
 
       const trimmed = value.trim();
 
-      if (trimmed.length > maxLength) return "";
+      if (trimmed.length > maxLength) {
+        return "";
+      }
 
       return trimmed;
     }
@@ -130,7 +134,9 @@ export async function handler(event) {
 
     let digits = mobile.replace(/\D/g, "");
 
-    if (digits.startsWith("00")) digits = digits.slice(2);
+    if (digits.startsWith("00")) {
+      digits = digits.slice(2);
+    }
 
     if (digits.length === 13 && digits.startsWith("910")) {
       digits = digits.slice(3);
@@ -164,7 +170,7 @@ export async function handler(event) {
     const endpoint = process.env.CRM_WEBHOOK_URL;
 
     if (!endpoint?.trim()) {
-      throw new Error("Missing CRM URL");
+      throw new Error("Missing CRM webhook URL");
     }
 
     reason = "missing_secret";
@@ -172,7 +178,7 @@ export async function handler(event) {
     const secret = process.env.CRM_WEBHOOK_SECRET;
 
     if (!secret?.trim()) {
-      throw new Error("Missing CRM secret");
+      throw new Error("Missing CRM webhook secret");
     }
 
     const fallback =
@@ -181,7 +187,7 @@ export async function handler(event) {
     reason = "invalid_configuration";
 
     if (![TRAINING, BROKING].includes(fallback)) {
-      throw new Error("Invalid business unit");
+      throw new Error("Invalid default business unit");
     }
 
     const url = new URL(endpoint);
@@ -200,14 +206,20 @@ export async function handler(event) {
       full_name,
       mobile,
       email,
+
       business_unit: businessUnitForServices(
         product_interest,
         fallback
       ),
+
       source: "Callback Form",
+
       campaign_name: null,
+
       product_interest,
+
       lead_grade: null,
+
       notes: null,
     };
 
@@ -215,12 +227,17 @@ export async function handler(event) {
 
     const response = await fetch(url.toString(), {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
+
         "x-webhook-secret": secret,
       },
+
       body: JSON.stringify(payload),
+
       signal: AbortSignal.timeout(15000),
+
       redirect: "error",
     });
 
@@ -244,18 +261,25 @@ export async function handler(event) {
       throw new Error("Unexpected CRM response");
     }
 
-    if (typeof result?.lead_id !== "string" || !result.lead_id) {
-      throw new Error("Missing lead id");
+    if (
+      typeof result?.lead_id !== "string" ||
+      !result.lead_id
+    ) {
+      throw new Error("CRM did not return lead id");
     }
 
     return reply(200, {
       success: true,
+
       message:
-        "Your response has been sent. Our team will get back to you.",
+        result.status === "duplicate"
+          ? "Your details are already with us. Our team will get back to you."
+          : "Your response has been sent. Our team will get back to you.",
     });
   } catch {
     console.error("Callback submission failed", {
       reason,
+
       ...(crmStatus === undefined
         ? {}
         : {
