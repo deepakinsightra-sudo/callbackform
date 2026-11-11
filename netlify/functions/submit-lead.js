@@ -49,6 +49,10 @@ async function saveToGoogleSheet({ name, phone, services }) {
   }
 
   try {
+    console.info("Google Sheet fallback attempt", {
+      endpoint_present: true,
+    });
+
     const response = await fetch(endpoint, {
       method: "POST",
 
@@ -70,8 +74,14 @@ async function saveToGoogleSheet({ name, phone, services }) {
 
     const body = await response.text().catch(() => "");
 
+    console.info("Google Sheet fallback response", {
+      status: response.status,
+      ok: response.ok,
+      body_preview: body.slice(0, 200),
+    });
+
     if (!response.ok) {
-      console.error("Sheet fallback failed", {
+      console.error("Sheet fallback HTTP error", {
         status: response.status,
       });
 
@@ -80,14 +90,18 @@ async function saveToGoogleSheet({ name, phone, services }) {
 
     if (body.trim().toLowerCase() === "invalid") {
       console.error("Sheet fallback rejected by Apps Script");
+
       return false;
     }
 
     console.info("Sheet fallback succeeded");
 
     return true;
-  } catch {
-    console.error("Sheet fallback connection failed");
+  } catch (error) {
+    console.error("Sheet fallback connection failed", {
+      name: error?.name || "UnknownError",
+      message: error?.message || "Unknown error",
+    });
 
     return false;
   }
@@ -131,7 +145,7 @@ export async function handler(event) {
       });
     }
 
-    if (!input || typeof input !== "object") {
+    if (!input || typeof input !== "object" || Array.isArray(input)) {
       return reply(400, {
         success: false,
         message: RETRY,
@@ -166,12 +180,12 @@ export async function handler(event) {
     ) {
       return reply(400, {
         success: false,
-        message: "Please check your details and try again.",
+        message:
+          "Please check your name and service details and try again.",
       });
     }
 
-    let digits =
-      phone.replace(/\D/g, "");
+    let digits = phone.replace(/\D/g, "");
 
     if (digits.startsWith("00")) {
       digits = digits.slice(2);
@@ -218,11 +232,20 @@ export async function handler(event) {
     let crmSaved = false;
 
     /*
-     * FIRST: Try CRM
+     * FIRST: TRY CRM
      */
 
     if (crmEndpoint && crmSecret) {
       try {
+        console.info("CRM webhook attempt", {
+          endpoint_present: true,
+          secret_present: true,
+          business_unit: businessUnitForServices(
+            services,
+            fallbackBusinessUnit
+          ),
+        });
+
         const payload = {
           full_name: name,
 
@@ -236,54 +259,50 @@ export async function handler(event) {
               fallbackBusinessUnit
             ),
 
-          source:
-            "Callback Form",
+          source: "Callback Form",
 
-          campaign_name:
-            null,
+          campaign_name: null,
 
-          product_interest:
-            services,
+          product_interest: services,
 
-          lead_grade:
-            null,
+          lead_grade: null,
 
-          notes:
-            null,
+          notes: null,
         };
 
-        const crmResponse =
-          await fetch(crmEndpoint, {
-            method: "POST",
+        const crmResponse = await fetch(crmEndpoint, {
+          method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json",
+          headers: {
+            "Content-Type": "application/json",
 
-              "x-webhook-secret":
-                crmSecret,
-            },
+            "x-webhook-secret": crmSecret,
+          },
 
-            body:
-              JSON.stringify(payload),
+          body: JSON.stringify(payload),
 
-            signal:
-              AbortSignal.timeout(
-                15000
-              ),
-          });
+          signal: AbortSignal.timeout(15000),
 
-        console.info(
-          "CRM webhook response",
-          {
-            status:
-              crmResponse.status,
-          }
-        );
+          redirect: "follow",
+        });
+
+        const crmBody =
+          await crmResponse.text().catch(() => "");
+
+        console.info("CRM webhook response", {
+          status: crmResponse.status,
+          ok: crmResponse.ok,
+          body_preview: crmBody.slice(0, 300),
+        });
 
         if (crmResponse.ok) {
-          const result =
-            await crmResponse.json();
+          let result = {};
+
+          try {
+            result = JSON.parse(crmBody);
+          } catch {
+            result = {};
+          }
 
           if (
             ["created", "duplicate"].includes(
@@ -291,24 +310,42 @@ export async function handler(event) {
             )
           ) {
             crmSaved = true;
+
+            console.info("CRM lead accepted", {
+              status: result.status,
+            });
+          } else {
+            console.error("CRM response invalid", {
+              status: crmResponse.status,
+              body_preview: crmBody.slice(0, 300),
+            });
           }
+        } else {
+          console.error("CRM returned error", {
+            status: crmResponse.status,
+            body_preview: crmBody.slice(0, 300),
+          });
         }
-      } catch {
-        console.error(
-          "CRM webhook failed"
-        );
+      } catch (error) {
+        console.error("CRM webhook fetch failed", {
+          name: error?.name || "UnknownError",
+          message: error?.message || "Unknown error",
+        });
       }
     } else {
-      console.error(
-        "CRM configuration missing"
-      );
+      console.error("CRM configuration missing", {
+        endpoint_present: Boolean(crmEndpoint),
+        secret_present: Boolean(crmSecret),
+      });
     }
 
     /*
      * CRM SUCCESS
      *
-     * CRM already handles Google
-     * Sheet sync internally.
+     * CRM itself is responsible for:
+     * Supabase storage
+     * allocation
+     * Google Sheet mirror
      */
 
     if (crmSaved) {
@@ -318,18 +355,15 @@ export async function handler(event) {
         message:
           "Your response has been sent. Our team will get back to you.",
 
-        destination:
-          "crm",
+        destination: "crm",
       });
     }
 
     /*
      * CRM FAILED
      *
-     * CRITICAL FALLBACK:
-     * Do not lose the lead.
-     *
-     * Save directly to Google Sheet.
+     * FALLBACK:
+     * Save directly to Google Sheet so lead is not lost.
      */
 
     console.warn(
@@ -344,9 +378,9 @@ export async function handler(event) {
       });
 
     /*
-     * Sheet saved successfully,
-     * therefore customer lead is
-     * NOT lost.
+     * SHEET SUCCESS
+     *
+     * Lead is preserved even though CRM failed.
      */
 
     if (sheetSaved) {
@@ -362,17 +396,22 @@ export async function handler(event) {
     }
 
     /*
-     * BOTH FAILED
+     * BOTH CRM AND SHEET FAILED
      */
+
+    console.error(
+      "Lead submission failed in both CRM and Google Sheet"
+    );
 
     return reply(502, {
       success: false,
       message: RETRY,
     });
-  } catch {
-    console.error(
-      "Unexpected callback failure"
-    );
+  } catch (error) {
+    console.error("Unexpected callback failure", {
+      name: error?.name || "UnknownError",
+      message: error?.message || "Unknown error",
+    });
 
     return reply(502, {
       success: false,
