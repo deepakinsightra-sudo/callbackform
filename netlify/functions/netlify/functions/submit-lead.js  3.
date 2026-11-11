@@ -1,1 +1,277 @@
+const TRAINING = "Training & Education";
+const BROKING = "Stock Broking & Investments";
 
+const RETRY =
+  "We could not send your response. Please try again in a moment.";
+
+function businessUnitForServices(services, fallback = BROKING) {
+  if (
+    /\b(courses?|training|education|learn(?:ing)?|workshops?|seminars?)\b/i.test(
+      services
+    )
+  ) {
+    return TRAINING;
+  }
+
+  if (
+    /\b(stocks?|broking|demat|trading|investments?|insurance|retirement|mutual\s+funds?|securities|pension|wealth|pms|aif|bonds?|loans?)\b/i.test(
+      services
+    )
+  ) {
+    return BROKING;
+  }
+
+  return fallback;
+}
+
+function reply(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    },
+    body: JSON.stringify(body),
+  };
+}
+
+export async function handler(event) {
+  if (event.httpMethod !== "POST") {
+    return {
+      ...reply(405, {
+        success: false,
+        message: RETRY,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+        Allow: "POST",
+      },
+    };
+  }
+
+  let reason = "invalid_request";
+  let crmStatus;
+
+  try {
+    const headers = Object.fromEntries(
+      Object.entries(event.headers || {}).map(([key, value]) => [
+        key.toLowerCase(),
+        value,
+      ])
+    );
+
+    const contentType = headers["content-type"]
+      ?.split(";")[0]
+      ?.trim()
+      ?.toLowerCase();
+
+    if (contentType !== "application/json") {
+      return reply(415, {
+        success: false,
+        message: RETRY,
+      });
+    }
+
+    const body = event.isBase64Encoded
+      ? Buffer.from(event.body || "", "base64").toString("utf8")
+      : event.body || "";
+
+    if (Buffer.byteLength(body, "utf8") > 16 * 1024) {
+      return reply(413, {
+        success: false,
+        message: RETRY,
+      });
+    }
+
+    let input;
+
+    try {
+      input = JSON.parse(body);
+    } catch {
+      return reply(400, {
+        success: false,
+        message: RETRY,
+      });
+    }
+
+    if (!input || typeof input !== "object" || Array.isArray(input)) {
+      return reply(400, {
+        success: false,
+        message: RETRY,
+      });
+    }
+
+    if (input["bot-field"]) {
+      return reply(200, {
+        success: true,
+        message: "Your response has been sent.",
+      });
+    }
+
+    function text(value, maxLength) {
+      if (typeof value !== "string") return "";
+
+      const trimmed = value.trim();
+
+      if (trimmed.length > maxLength) return "";
+
+      return trimmed;
+    }
+
+    const full_name = text(input.name, 200);
+    const mobile = text(input.phone, 40);
+    const product_interest = text(input.services, 500);
+
+    const email =
+      input.email == null || input.email === ""
+        ? null
+        : text(input.email, 254);
+
+    let digits = mobile.replace(/\D/g, "");
+
+    if (digits.startsWith("00")) digits = digits.slice(2);
+
+    if (digits.length === 13 && digits.startsWith("910")) {
+      digits = digits.slice(3);
+    }
+
+    if (digits.length === 12 && digits.startsWith("91")) {
+      digits = digits.slice(2);
+    }
+
+    if (digits.length === 11 && digits.startsWith("0")) {
+      digits = digits.slice(1);
+    }
+
+    if (
+      full_name.length < 2 ||
+      product_interest.length < 3 ||
+      !/^\+?[\d\s().-]+$/.test(mobile) ||
+      !/^\d{10,15}$/.test(digits) ||
+      (input.email &&
+        (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
+    ) {
+      return reply(400, {
+        success: false,
+        message:
+          "Please check your name, phone number and service details, then try again.",
+      });
+    }
+
+    reason = "missing_url";
+
+    const endpoint = process.env.CRM_WEBHOOK_URL;
+
+    if (!endpoint?.trim()) {
+      throw new Error("Missing CRM URL");
+    }
+
+    reason = "missing_secret";
+
+    const secret = process.env.CRM_WEBHOOK_SECRET;
+
+    if (!secret?.trim()) {
+      throw new Error("Missing CRM secret");
+    }
+
+    const fallback =
+      process.env.CALLBACK_DEFAULT_BUSINESS_UNIT || BROKING;
+
+    reason = "invalid_configuration";
+
+    if (![TRAINING, BROKING].includes(fallback)) {
+      throw new Error("Invalid business unit");
+    }
+
+    const url = new URL(endpoint);
+
+    if (
+      url.protocol !== "https:" &&
+      !(
+        url.protocol === "http:" &&
+        ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+      )
+    ) {
+      throw new Error("Invalid CRM URL");
+    }
+
+    const payload = {
+      full_name,
+      mobile,
+      email,
+      business_unit: businessUnitForServices(
+        product_interest,
+        fallback
+      ),
+      source: "Callback Form",
+      campaign_name: null,
+      product_interest,
+      lead_grade: null,
+      notes: null,
+    };
+
+    reason = "connection_failure";
+
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-webhook-secret": secret,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(15000),
+      redirect: "error",
+    });
+
+    crmStatus = response.status;
+
+    console.info("Callback CRM response", {
+      crm_status: crmStatus,
+    });
+
+    reason = "crm_http_error";
+
+    if (!response.ok) {
+      throw new Error("CRM request failed");
+    }
+
+    reason = "invalid_crm_response";
+
+    const result = await response.json();
+
+    if (!["created", "duplicate"].includes(result?.status)) {
+      throw new Error("Unexpected CRM response");
+    }
+
+    if (typeof result?.lead_id !== "string" || !result.lead_id) {
+      throw new Error("Missing lead id");
+    }
+
+    return reply(200, {
+      success: true,
+      message:
+        "Your response has been sent. Our team will get back to you.",
+    });
+  } catch {
+    console.error("Callback submission failed", {
+      reason,
+      ...(crmStatus === undefined
+        ? {}
+        : {
+            crm_status: crmStatus,
+          }),
+    });
+
+    const configurationError = [
+      "missing_url",
+      "missing_secret",
+      "invalid_configuration",
+    ].includes(reason);
+
+    return reply(configurationError ? 503 : 502, {
+      success: false,
+      message: RETRY,
+    });
+  }
+}
