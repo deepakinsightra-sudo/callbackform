@@ -121,12 +121,12 @@ async function saveToGoogleSheet({
       },
 
       body: new URLSearchParams({
-        Name: name,
-        Phone: phone,
-        Income: income,
-        Networth: worth,
-        Lead_grade: leadGrade,
-        "Services expected": services,
+        name,
+        phone,
+        income,
+        worth,
+        lead_grade: leadGrade,
+        services,
         "bot-field": "",
       }).toString(),
 
