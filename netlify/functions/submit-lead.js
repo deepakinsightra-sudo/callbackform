@@ -97,7 +97,8 @@ async function saveToGoogleSheet({
 }) {
   const endpoint =
     process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
-    process.env.GOOGLE_APPS_SCRIPT_URL;
+    process.env.GOOGLE_APPS_SCRIPT_URL ||
+    "https://script.google.com/macros/s/AKfycbxva2jS9Zol0XTYcQHccRqpsL_WLl6oTJ1PMBUIIh5X9wW88MzsScNBOi5hvKlyYdDhsA/exec";
 
   if (!endpoint) {
     console.error("Sheet fallback unavailable", {
