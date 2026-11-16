@@ -265,7 +265,9 @@ export async function handler(event) {
 
           product_interest: services,
 
-          lead_grade: null,
+          lead_grade: leadGrade,
+
+4.,
 
           notes: null,
         };
