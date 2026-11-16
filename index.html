@@ -1605,8 +1605,16 @@ kbd {
       );
 
 
+      var diagnostic =
+        result &&
+        result.diagnostic
+          ? ' CRM: ' + (result.diagnostic.crm || 'unknown') +
+            ' | Sheet: ' + (result.diagnostic.sheet || 'unknown')
+          : '';
+
       errs[cur].textContent =
-        'We could not send your response. Please try again.';
+        'We could not send your response. Please try again.' +
+        diagnostic;
 
 
       try {
