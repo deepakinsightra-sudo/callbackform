@@ -92,6 +92,7 @@ async function saveToGoogleSheet({
   phone,
   income,
   worth,
+  leadGrade,
   services,
 }) {
   const endpoint =
@@ -120,11 +121,12 @@ async function saveToGoogleSheet({
       },
 
       body: new URLSearchParams({
-        name,
-        phone,
-        income,
-        worth,
-        services,
+        Name: name,
+        Phone: phone,
+        Income: income,
+        Networth: worth,
+        Lead_grade: leadGrade,
+        "Services expected": services,
         "bot-field": "",
       }).toString(),
 
@@ -623,6 +625,7 @@ export async function handler(event) {
         phone,
         income,
         worth,
+        leadGrade,
         services,
       });
 
