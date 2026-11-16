@@ -592,32 +592,14 @@ export async function handler(event) {
     }
 
     /*
-     * CRM SUCCESS
+     * SAVE TO GOOGLE SHEET FOR EVERY CALLBACK SUBMISSION
+     *
+     * Callback Form has two independent destinations:
+     * 1. CRM / Supabase
+     * 2. Google Sheet
+     *
+     * Do not depend on CRM mirroring for callback-form leads.
      */
-
-    if (crmSaved) {
-      return reply(200, {
-        success: true,
-
-        message:
-          "Your response has been sent. Our team will get back to you.",
-
-        destination:
-          "crm",
-
-        lead_grade:
-          leadGrade,
-      });
-    }
-
-    /*
-     * CRM FAILED
-     * SAVE TO GOOGLE SHEET
-     */
-
-    console.warn(
-      "CRM failed. Attempting Google Sheet fallback."
-    );
 
     const sheetSaved =
       await saveToGoogleSheet({
@@ -629,7 +611,11 @@ export async function handler(event) {
         services,
       });
 
-    if (sheetSaved) {
+    /*
+     * Both destinations succeeded.
+     */
+
+    if (crmSaved && sheetSaved) {
       return reply(200, {
         success: true,
 
@@ -637,9 +623,65 @@ export async function handler(event) {
           "Your response has been sent. Our team will get back to you.",
 
         destination:
-          "google_sheet_fallback",
+          "crm_and_google_sheet",
+
+        lead_grade:
+          leadGrade,
       });
     }
+
+    /*
+     * CRM succeeded but Sheet failed.
+     *
+     * The lead is safely captured in CRM,
+     * so the customer should still see success.
+     */
+
+    if (crmSaved) {
+      console.error(
+        "CRM saved the lead, but Google Sheet sync failed."
+      );
+
+      return reply(200, {
+        success: true,
+
+        message:
+          "Your response has been sent. Our team will get back to you.",
+
+        destination:
+          "crm_only",
+
+        lead_grade:
+          leadGrade,
+      });
+    }
+
+    /*
+     * CRM failed but Sheet succeeded.
+     */
+
+    if (sheetSaved) {
+      console.warn(
+        "CRM failed. Lead preserved in Google Sheet."
+      );
+
+      return reply(200, {
+        success: true,
+
+        message:
+          "Your response has been sent. Our team will get back to you.",
+
+        destination:
+          "google_sheet_only",
+
+        lead_grade:
+          leadGrade,
+      });
+    }
+
+    /*
+     * Both destinations failed.
+     */
 
     console.error(
       "Lead submission failed in both CRM and Google Sheet"
