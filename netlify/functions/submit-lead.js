@@ -393,36 +393,52 @@ export async function handler(event) {
         );
 
         const payload = {
-          full_name:
-            name,
+  full_name:
+    name,
 
-          mobile:
-            phone,
+  mobile:
+    phone,
 
-          email:
-            null,
+  email:
+    null,
 
-          business_unit:
-            businessUnitForServices(
-              services,
-              fallbackBusinessUnit
-            ),
+  business_unit:
+    businessUnitForServices(
+      services,
+      fallbackBusinessUnit
+    ),
 
-          source:
-            "Callback Form",
+  source:
+    "Callback Form",
 
-          campaign_name:
-            null,
+  campaign_name:
+    null,
 
-          product_interest:
-            services,
+  /*
+   * Service Expected
+   */
+  product_interest:
+    services,
 
-          lead_grade:
-            leadGrade,
+  lead_grade:
+    leadGrade,
 
-          notes:
-            `Monthly Income: ${income}\nNet Worth: ${worth}`,
-        };
+  /*
+   * Customer 360 fields
+   */
+  monthly_income:
+    income,
+
+  net_worth:
+    worth,
+
+  /*
+   * Income / net worth no longer need
+   * to be hidden inside notes.
+   */
+  notes:
+    null,
+};
 
         const crmResponse =
           await fetch(
