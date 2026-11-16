@@ -1,33 +1,1091 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+
+<title>Vachana Client Enquiry</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Karla:wght@400;500;700&display=swap">
+
+<style>
+:root {
+  --bg: #F2F4F8;
+  --surface: #FFFFFF;
+  --ink: #0D2038;
+  --muted: #4F5F78;
+  --line: #C3CCDA;
+  --brass: #86651A;
+  --brass-fill: #C9A24B;
+  --on-brass: #0D2038;
+  --error: #A32B2B;
+
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A1A30;
+    --surface: #11264A;
+    --ink: #EEF1F6;
+    --muted: #A5B2C6;
+    --line: #2C4670;
+    --brass: #D2AC58;
+    --brass-fill: #D2AC58;
+    --on-brass: #0A1A30;
+    --error: #F0948F;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0A1A30;
+  --surface: #11264A;
+  --ink: #EEF1F6;
+  --muted: #A5B2C6;
+  --line: #2C4670;
+  --brass: #D2AC58;
+  --brass-fill: #D2AC58;
+  --on-brass: #0A1A30;
+  --error: #F0948F;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+.app {
+  height: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 16px;
+
+  flex: 1;
+  min-width: 0;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex: none;
+  display: block;
+
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.logo-lg {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 26px;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.brand-tag {
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.progress {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--brass-fill);
+  transition: width 0.4s ease;
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+
+  padding-block: 24px;
+  overflow-y: auto;
+}
+
+main > .screen,
+#form {
+  margin-block: auto;
+}
+
+#form {
+  width: 100%;
+}
+
+.screen {
+  width: 100%;
+  animation: rise 0.35s ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+h1,
+h2,
+.q-label {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2rem, 7vw, 3.1rem);
+}
+
+h2 {
+  font-size: clamp(1.7rem, 5.5vw, 2.5rem);
+}
+
+.lead {
+  max-width: 52ch;
+  color: var(--muted);
+  margin: 18px 0 0;
+}
+
+.kicker {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.q-label {
+  display: block;
+  font-size: clamp(1.55rem, 5.2vw, 2.3rem);
+}
+
+.q-count {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.q-help {
+  color: var(--muted);
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+}
+
+.field {
+  display: block;
+  width: 100%;
+
+  margin-top: 26px;
+  padding: 8px 0 10px;
+
+  background: transparent;
+  color: var(--ink);
+
+  border: 0;
+  border-bottom: 2px solid var(--line);
+  border-radius: 0;
+
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 4.6vw, 1.9rem);
+  line-height: 1.3;
+
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.field:focus {
+  border-bottom-color: var(--brass-fill);
+}
+
+textarea.field {
+  resize: none;
+  min-height: 7.5rem;
+  font-size: clamp(1.1rem, 3.8vw, 1.45rem);
+}
+
+.field[aria-invalid="true"] {
+  border-bottom-color: var(--error);
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.92rem;
+  min-height: 1.4em;
+  margin: 8px 0 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+
+  margin-top: 22px;
+}
+
+.btn {
+  appearance: none;
+  border: 0;
+
+  background: var(--brass-fill);
+  color: var(--on-brass);
+
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+
+  padding: 13px 26px;
+
+  border-radius: 4px;
+  cursor: pointer;
+
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+
+.btn:hover {
+  filter: brightness(1.07);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+kbd {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+
+  border: 1px solid var(--line);
+  border-radius: 3px;
+
+  padding: 1px 6px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass-fill);
+  outline-offset: 3px;
+}
+
+.field:focus-visible {
+  outline: none;
+}
+
+.opts {
+  display: grid;
+  gap: 10px;
+
+  margin-top: 24px;
+  max-width: 520px;
+}
+
+.opt {
+  appearance: none;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  width: 100%;
+
+  text-align: left;
+
+  background: var(--surface);
+  color: var(--ink);
+
+  border: 1px solid var(--line);
+  border-radius: 4px;
+
+  padding: 13px 16px;
+
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.opt:hover {
+  border-color: var(--brass-fill);
+}
+
+.opt[aria-checked="true"] {
+  border-color: var(--brass-fill);
+  box-shadow: inset 0 0 0 1px var(--brass-fill);
+  font-weight: 700;
+}
+
+.opt-key {
+  flex: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  border: 1px solid var(--line);
+  border-radius: 3px;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  color: var(--brass);
+}
+
+.opt[aria-checked="true"] .opt-key {
+  background: var(--brass-fill);
+  border-color: var(--brass-fill);
+  color: var(--on-brass);
+}
+
+.privacy {
+  margin-top: 28px;
+  padding-left: 14px;
+
+  border-left: 3px solid var(--brass-fill);
+
+  max-width: 54ch;
+
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.bottom {
+  padding-bottom: 16px;
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.link {
+  appearance: none;
+
+  background: none;
+  border: 0;
+
+  padding: 8px 0;
+
+  color: var(--muted);
+
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    animation: none;
+  }
+
+  .progress > span {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100%;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header class="top">
+
+    <div class="brand">
+
+      <img
+        class="logo"
+        src="logo.jpg"
+        alt="Vachana Investments logo"
+        width="52"
+        height="52"
+      >
+
+      <div class="brand-text">
+
+        <span class="brand-name">
+          Vachana Investments Pvt Ltd
+        </span>
+
+        <span class="brand-tag">
+          Confidentiality · Integrity · Precision
+        </span>
+
+      </div>
+
+    </div>
+
+    <div
+      class="progress"
+      role="progressbar"
+      aria-label="Form progress"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      id="progress"
+    >
+      <span id="bar"></span>
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- WELCOME -->
+
+    <section
+      class="screen"
+      id="welcome"
+    >
+
+      <img
+        class="logo logo-lg"
+        src="logo.jpg"
+        alt=""
+        width="120"
+        height="120"
+      >
+
+      <p class="kicker">
+        Client Details
+      </p>
+
+      <h1>
+        Help us serve you better.
+      </h1>
+
+      <p class="lead">
+        Five short questions. It takes about a minute.
+      </p>
+
+      <p class="privacy">
+        Your privacy matters to us. Everything you share stays strictly confidential and is used only for internal purposes to understand your financial goals and journey, so that we can serve you better.
+      </p>
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="btn"
+          id="start"
+        >
+          Start
+        </button>
+
+        <span class="hint">
+          press <kbd>Enter</kbd>
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- FORM -->
+
+    <form
+      id="form"
+      novalidate
+      autocomplete="on"
+      hidden
+    >
+
+      <!-- honeypot -->
+
+      <p hidden>
+        <label>
+          Leave this empty
+          <input
+            name="bot-field"
+            tabindex="-1"
+            autocomplete="off"
+          >
+        </label>
+      </p>
+
+
+      <!-- QUESTION 1 -->
+
+      <div
+        class="screen"
+        data-step="0"
+        hidden
+      >
+
+        <label
+          class="q-label"
+          for="f-name"
+        >
+
+          <span class="q-count">
+            1 of 5
+          </span>
+
+          What is your name?
+
+        </label>
+
+        <input
+          class="field"
+          id="f-name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          placeholder="Type your full name"
+          aria-describedby="e-name"
+        >
+
+        <p
+          class="error"
+          id="e-name"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+          >
+            OK
+          </button>
+
+          <span class="hint">
+            press <kbd>Enter</kbd>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUESTION 2 -->
+
+      <div
+        class="screen"
+        data-step="1"
+        hidden
+      >
+
+        <label
+          class="q-label"
+          for="f-phone"
+        >
+
+          <span class="q-count">
+            2 of 5
+          </span>
+
+          What is your phone number?
+
+        </label>
+
+        <input
+          class="field"
+          id="f-phone"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="+91 98450 00000"
+          aria-describedby="e-phone"
+        >
+
+        <p
+          class="error"
+          id="e-phone"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+          >
+            OK
+          </button>
+
+          <span class="hint">
+            press <kbd>Enter</kbd>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUESTION 3 -->
+
+      <div
+        class="screen"
+        data-step="2"
+        hidden
+      >
+
+        <p
+          class="q-label"
+          id="q-income"
+        >
+
+          <span class="q-count">
+            3 of 5
+          </span>
+
+          What is your monthly income?
+
+        </p>
+
+        <p class="q-help">
+          Choose the range that fits you.
+        </p>
+
+        <input
+          type="hidden"
+          id="f-income"
+          value=""
+        >
+
+        <div
+          class="opts"
+          role="radiogroup"
+          aria-labelledby="q-income"
+        >
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹0 to ₹50,000"
+          >
+            <span class="opt-key">A</span>
+            ₹0 to ₹50,000
+          </button>
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹50,000 to ₹1,00,000"
+          >
+            <span class="opt-key">B</span>
+            ₹50,000 to ₹1,00,000
+          </button>
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹1,00,000 to ₹5,00,000"
+          >
+            <span class="opt-key">C</span>
+            ₹1,00,000 to ₹5,00,000
+          </button>
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹5,00,000 and more"
+          >
+            <span class="opt-key">D</span>
+            ₹5,00,000 and more
+          </button>
+
+        </div>
+
+        <p
+          class="error"
+          id="e-income"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+          >
+            OK
+          </button>
+
+          <span class="hint">
+            choose one
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUESTION 4 -->
+
+      <div
+        class="screen"
+        data-step="3"
+        hidden
+      >
+
+        <p
+          class="q-label"
+          id="q-worth"
+        >
+
+          <span class="q-count">
+            4 of 5
+          </span>
+
+          What is your net worth as on today?
+
+        </p>
+
+        <p class="q-help">
+          Market value of all assets minus liabilities.
+        </p>
+
+        <input
+          type="hidden"
+          id="f-worth"
+          value=""
+        >
+
+        <div
+          class="opts"
+          role="radiogroup"
+          aria-labelledby="q-worth"
+        >
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹0 to ₹50 Lakhs"
+          >
+            <span class="opt-key">A</span>
+            ₹0 to ₹50 Lakhs
+          </button>
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹50 Lakhs to ₹5 Crore"
+          >
+            <span class="opt-key">B</span>
+            ₹50 Lakhs to ₹5 Crore
+          </button>
+
+          <button
+            type="button"
+            class="opt"
+            role="radio"
+            aria-checked="false"
+            data-value="₹5 Crore and above"
+          >
+            <span class="opt-key">C</span>
+            ₹5 Crore and above
+          </button>
+
+        </div>
+
+        <p
+          class="error"
+          id="e-worth"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+          >
+            OK
+          </button>
+
+          <span class="hint">
+            choose one
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUESTION 5 -->
+
+      <div
+        class="screen"
+        data-step="4"
+        hidden
+      >
+
+        <label
+          class="q-label"
+          for="f-services"
+        >
+
+          <span class="q-count">
+            5 of 5
+          </span>
+
+          What services do you expect from us?
+
+        </label>
+
+        <p class="q-help">
+          For example investments, insurance, retirement planning or tax planning.
+        </p>
+
+        <textarea
+          class="field"
+          id="f-services"
+          name="services"
+          rows="3"
+          placeholder="Type your answer here"
+          aria-describedby="e-services"
+        ></textarea>
+
+        <p
+          class="error"
+          id="e-services"
+          role="alert"
+        ></p>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn"
+            data-next
+            id="submit"
+          >
+            Submit
+          </button>
+
+          <span class="hint">
+            <kbd>Shift</kbd> + <kbd>Enter</kbd> for new line
+          </span>
+
+        </div>
+
+      </div>
+
+    </form>
+
+
+    <!-- SUCCESS -->
+
+    <section
+      class="screen"
+      id="done"
+      hidden
+      tabindex="-1"
+    >
+
+      <h2>
+        Thank you for your response.
+      </h2>
+
+      <p class="lead">
+        Our team will get back to you.
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <footer class="bottom">
+
+    <button
+      type="button"
+      class="link"
+      id="back"
+      hidden
+    >
+      ← Back
+    </button>
+
+    <span></span>
+
+  </footer>
+
+</div>
+
+
 <script>
 (function () {
 
-  /*
-   * Callback Form
-   *
-   * Browser sends ONE request to:
-   * /.netlify/functions/submit-lead
-   *
-   * Netlify function then handles:
-   * 1. CRM
-   * 2. A/B/C qualification
-   * 3. Google Sheet fallback if CRM fails
-   */
-
-  var SUBMIT_URL = '/.netlify/functions/submit-lead';
+  var SUBMIT_URL =
+    '/.netlify/functions/submit-lead';
 
   var els = {
-    welcome: document.getElementById('welcome'),
-    form: document.getElementById('form'),
-    done: document.getElementById('done'),
-    responses: document.getElementById('responses'),
-    bar: document.getElementById('bar'),
-    progress: document.getElementById('progress'),
-    back: document.getElementById('back')
+
+    welcome:
+      document.getElementById(
+        'welcome'
+      ),
+
+    form:
+      document.getElementById(
+        'form'
+      ),
+
+    done:
+      document.getElementById(
+        'done'
+      ),
+
+    bar:
+      document.getElementById(
+        'bar'
+      ),
+
+    progress:
+      document.getElementById(
+        'progress'
+      ),
+
+    back:
+      document.getElementById(
+        'back'
+      )
   };
 
-  var steps = Array.prototype.slice.call(
-    document.querySelectorAll('[data-step]')
-  );
+
+  var steps =
+    Array.prototype.slice.call(
+      document.querySelectorAll(
+        '[data-step]'
+      )
+    );
+
 
   var fields = [
     'f-name',
@@ -36,8 +1094,13 @@
     'f-worth',
     'f-services'
   ].map(function (id) {
-    return document.getElementById(id);
+
+    return document.getElementById(
+      id
+    );
+
   });
+
 
   var errs = [
     'e-name',
@@ -46,67 +1109,80 @@
     'e-worth',
     'e-services'
   ].map(function (id) {
-    return document.getElementById(id);
+
+    return document.getElementById(
+      id
+    );
+
   });
 
-  var cur = -1;
-  var sending = false;
 
-  /*
-   * Validation
-   */
+  var cur = -1;
+
+  var sending =
+    false;
+
 
   var checks = [
 
-    // Name
     function (v) {
+
       return v.trim().length >= 2
         ? ''
         : 'Please enter your name.';
+
     },
 
-    // Phone
     function (v) {
 
-      var digits = v.replace(/\D/g, '');
+      var digits =
+        v.replace(
+          /\D/g,
+          ''
+        );
 
       if (
-        !/^[+\d][\d\s\-()]*$/.test(v.trim()) ||
+        !/^[+\d][\d\s\-()]*$/.test(
+          v.trim()
+        ) ||
         digits.length < 7 ||
         digits.length > 15
       ) {
+
         return 'Please enter a valid phone number, for example +91 98450 00000.';
+
       }
 
       return '';
+
     },
 
-    // Income
     function (v) {
+
       return v
         ? ''
         : 'Please choose one option.';
+
     },
 
-    // Net Worth
     function (v) {
+
       return v
         ? ''
         : 'Please choose one option.';
+
     },
 
-    // Services
     function (v) {
+
       return v.trim().length >= 3
         ? ''
         : 'Please tell us what you expect from us.';
+
     }
 
   ];
 
-  /*
-   * Progress bar
-   */
 
   function setProgress(i) {
 
@@ -114,7 +1190,9 @@
       i < 0
         ? 0
         : Math.round(
-            (i / steps.length) * 100
+            ((i + 1) /
+              steps.length) *
+              100
           );
 
     els.bar.style.width =
@@ -124,121 +1202,151 @@
       'aria-valuenow',
       String(pct)
     );
+
   }
 
-  /*
-   * Show question
-   */
 
-  function showStep(i, dir) {
+  function showStep(
+    i,
+    dir
+  ) {
 
     cur = i;
 
-    els.welcome.hidden = true;
-    els.done.hidden = true;
+    els.welcome.hidden =
+      true;
 
-    if (els.responses) {
-      els.responses.hidden = true;
-    }
+    els.done.hidden =
+      true;
 
-    els.form.hidden = false;
+    els.form.hidden =
+      false;
+
 
     steps.forEach(
-      function (s, k) {
-        s.hidden = k !== i;
+      function (
+        screen,
+        index
+      ) {
+
+        screen.hidden =
+          index !== i;
+
       }
     );
+
 
     els.back.hidden =
       i === 0;
 
+
     setProgress(i);
 
-    var f = fields[i];
+
+    var field =
+      fields[i];
+
 
     var opts =
-      steps[i].querySelectorAll(
-        '.opt'
-      );
+      steps[i]
+        .querySelectorAll(
+          '.opt'
+        );
 
-    /*
-     * Radio-style options
-     */
 
     if (opts.length) {
 
-      var pick =
-        steps[i].querySelector(
-          '.opt[aria-checked="true"]'
-        ) || opts[0];
+      var selected =
+        steps[i]
+          .querySelector(
+            '.opt[aria-checked="true"]'
+          ) ||
+        opts[0];
+
 
       try {
-        pick.focus({
+
+        selected.focus({
           preventScroll: true
         });
+
       } catch (e) {
-        pick.focus();
+
+        selected.focus();
+
       }
 
       return;
+
     }
 
-    /*
-     * Text fields
-     */
 
     try {
-      f.focus({
+
+      field.focus({
         preventScroll: true
       });
+
     } catch (e) {
-      f.focus();
+
+      field.focus();
+
     }
 
+
     if (
-      f.setSelectionRange &&
-      f.type === 'text' &&
+      field.setSelectionRange &&
+      field.type ===
+        'text' &&
       dir === 'back'
     ) {
 
-      var len =
-        f.value.length;
+      var length =
+        field.value.length;
 
-      f.setSelectionRange(
-        len,
-        len
+      field.setSelectionRange(
+        length,
+        length
       );
+
     }
+
   }
 
-  /*
-   * Show only one screen
-   */
 
-  function showOnly(el) {
+  function showDone() {
 
-    els.welcome.hidden = true;
-    els.form.hidden = true;
-    els.done.hidden = true;
+    els.form.hidden =
+      true;
 
-    if (els.responses) {
-      els.responses.hidden = true;
-    }
+    els.welcome.hidden =
+      true;
 
-    el.hidden = false;
+    els.done.hidden =
+      false;
 
-    els.back.hidden = true;
+    els.back.hidden =
+      true;
+
+    els.bar.style.width =
+      '100%';
+
+    els.progress.setAttribute(
+      'aria-valuenow',
+      '100'
+    );
+
 
     try {
-      el.focus({
+
+      els.done.focus({
         preventScroll: true
       });
+
     } catch (e) {}
+
   }
 
-  /*
-   * Validate question
-   */
 
   function validate(i) {
 
@@ -249,6 +1357,7 @@
 
     errs[i].textContent =
       msg;
+
 
     if (msg) {
 
@@ -262,14 +1371,14 @@
       fields[i].removeAttribute(
         'aria-invalid'
       );
+
     }
 
+
     return !msg;
+
   }
 
-  /*
-   * Next question
-   */
 
   function next() {
 
@@ -277,23 +1386,33 @@
       sending ||
       cur < 0
     ) {
+
       return;
+
     }
 
-    if (!validate(cur)) {
+
+    if (
+      !validate(cur)
+    ) {
 
       var option =
-        steps[cur].querySelector(
-          '.opt'
-        );
+        steps[cur]
+          .querySelector(
+            '.opt'
+          );
+
 
       (
         option ||
         fields[cur]
       ).focus();
 
+
       return;
+
     }
+
 
     if (
       cur <
@@ -308,12 +1427,11 @@
     } else {
 
       submit();
+
     }
+
   }
 
-  /*
-   * Collect form data
-   */
 
   function values() {
 
@@ -341,69 +1459,45 @@
         fields[4]
           .value
           .trim()
+
     };
+
   }
 
-  /*
-   * Thank-you page
-   */
-
-  function thanks() {
-
-    els.bar.style.width =
-      '100%';
-
-    els.progress.setAttribute(
-      'aria-valuenow',
-      '100'
-    );
-
-    showOnly(
-      els.done
-    );
-  }
-
-  /*
-   * SUBMIT
-   *
-   * Sends to Netlify Function.
-   *
-   * The function handles:
-   *
-   * CRM
-   * Supabase
-   * A/B/C lead grade
-   * Google Sheet fallback
-   */
 
   async function submit() {
 
     var v =
       values();
 
+
     var btn =
       document.getElementById(
         'submit'
       );
+
 
     var trap =
       document.querySelector(
         'input[name="bot-field"]'
       );
 
-    sending = true;
 
-    btn.disabled = true;
+    sending =
+      true;
+
+
+    btn.disabled =
+      true;
+
 
     btn.textContent =
       'Sending…';
 
-    /*
-     * Remove any previous error
-     */
 
     errs[cur].textContent =
       '';
+
 
     try {
 
@@ -411,11 +1505,15 @@
         await fetch(
           SUBMIT_URL,
           {
-            method: 'POST',
+
+            method:
+              'POST',
 
             headers: {
+
               'Content-Type':
                 'application/json'
+
             },
 
             body:
@@ -440,15 +1538,16 @@
                   trap
                     ? trap.value
                     : ''
+
               })
+
           }
         );
 
-      /*
-       * Try reading server response
-       */
 
-      var result = {};
+      var result =
+        {};
+
 
       try {
 
@@ -457,21 +1556,22 @@
 
       } catch (e) {
 
-        result = {};
+        result =
+          {};
+
       }
 
-      /*
-       * Submission successful
-       */
 
       if (
         response.ok &&
-        result.success === true
+        result.success ===
+          true
       ) {
 
         console.log(
-          'Lead submitted successfully',
+          'Lead submitted',
           {
+
             destination:
               result.destination ||
               'unknown',
@@ -479,22 +1579,23 @@
             lead_grade:
               result.lead_grade ||
               null
+
           }
         );
 
-        thanks();
+
+        showDone();
 
         return;
+
       }
 
-      /*
-       * Server rejected submission
-       */
 
       throw new Error(
         result.message ||
         'Submission failed'
       );
+
 
     } catch (error) {
 
@@ -503,8 +1604,10 @@
         error
       );
 
+
       errs[cur].textContent =
         'We could not send your response. Please try again.';
+
 
       try {
 
@@ -512,23 +1615,29 @@
 
       } catch (e) {}
 
+
     } finally {
 
-      sending = false;
+      sending =
+        false;
 
-      btn.disabled = false;
+
+      btn.disabled =
+        false;
+
 
       btn.textContent =
         'Submit';
+
     }
+
   }
 
-  /*
-   * START BUTTON
-   */
 
   document
-    .getElementById('start')
+    .getElementById(
+      'start'
+    )
     .addEventListener(
       'click',
       function () {
@@ -537,151 +1646,182 @@
           0,
           'fwd'
         );
+
       }
     );
 
-  /*
-   * NEXT BUTTONS
-   */
 
   steps.forEach(
-    function (s) {
+    function (screen) {
 
-      s.querySelector(
-        '[data-next]'
-      ).addEventListener(
-        'click',
-        next
-      );
+      var nextButton =
+        screen.querySelector(
+          '[data-next]'
+        );
+
+
+      if (nextButton) {
+
+        nextButton.addEventListener(
+          'click',
+          next
+        );
+
+      }
+
     }
   );
 
-  /*
-   * BACK BUTTON
-   */
 
   els.back.addEventListener(
     'click',
     function () {
 
-      if (cur > 0) {
+      if (
+        cur > 0
+      ) {
 
         showStep(
           cur - 1,
           'back'
         );
+
       }
+
     }
   );
 
-  /*
-   * Input fields
-   */
 
   fields.forEach(
-    function (f, i) {
+    function (
+      field,
+      i
+    ) {
 
-      f.addEventListener(
+      field.addEventListener(
         'input',
         function () {
 
           if (
-            f.getAttribute(
+            field.getAttribute(
               'aria-invalid'
             )
           ) {
 
             validate(i);
+
           }
+
         }
       );
 
-      f.addEventListener(
+
+      field.addEventListener(
         'keydown',
-        function (e) {
+        function (event) {
 
           if (
-            e.key !== 'Enter' ||
-            e.isComposing
+            event.key !==
+              'Enter' ||
+            event.isComposing
           ) {
+
             return;
+
           }
 
-          /*
-           * Shift + Enter
-           * creates new line
-           * in textarea.
-           */
 
           if (
-            f.tagName ===
+            field.tagName ===
               'TEXTAREA' &&
-            e.shiftKey
+            event.shiftKey
           ) {
+
             return;
+
           }
 
-          e.preventDefault();
+
+          event.preventDefault();
 
           next();
+
         }
       );
+
     }
   );
 
-  /*
-   * Multiple-choice buttons
-   */
 
   steps.forEach(
-    function (s, i) {
+    function (
+      screen,
+      i
+    ) {
 
       var opts =
         Array.prototype.slice.call(
-          s.querySelectorAll(
+          screen.querySelectorAll(
             '.opt'
           )
         );
 
-      if (!opts.length) {
+
+      if (
+        !opts.length
+      ) {
+
         return;
+
       }
 
-      function choose(btn) {
+
+      function choose(
+        button
+      ) {
 
         opts.forEach(
-          function (o) {
+          function (option) {
 
-            o.setAttribute(
+            option.setAttribute(
+
               'aria-checked',
 
-              o === btn
+              option === button
                 ? 'true'
                 : 'false'
+
             );
+
           }
         );
 
+
         fields[i].value =
-          btn.getAttribute(
+          button.getAttribute(
             'data-value'
           );
 
+
         validate(i);
+
       }
 
+
       opts.forEach(
-        function (btn, k) {
+        function (
+          button,
+          index
+        ) {
 
-          /*
-           * Mouse / touch selection
-           */
-
-          btn.addEventListener(
+          button.addEventListener(
             'click',
             function () {
 
-              choose(btn);
+              choose(
+                button
+              );
+
 
               setTimeout(
                 function () {
@@ -691,117 +1831,128 @@
                   ) {
 
                     next();
+
                   }
+
                 },
                 250
               );
+
             }
           );
 
-          /*
-           * Keyboard controls
-           */
 
-          btn.addEventListener(
+          button.addEventListener(
             'keydown',
-            function (e) {
+            function (event) {
 
               if (
-                e.key ===
+                event.key ===
                   'ArrowDown' ||
-                e.key ===
+                event.key ===
                   'ArrowRight'
               ) {
 
-                e.preventDefault();
+                event.preventDefault();
+
 
                 opts[
-                  (k + 1) %
+                  (index + 1) %
                     opts.length
                 ].focus();
 
+
               } else if (
-                e.key ===
+                event.key ===
                   'ArrowUp' ||
-                e.key ===
+                event.key ===
                   'ArrowLeft'
               ) {
 
-                e.preventDefault();
+                event.preventDefault();
+
 
                 opts[
                   (
-                    k -
+                    index -
                     1 +
                     opts.length
                   ) %
                     opts.length
                 ].focus();
 
+
               } else {
 
-                /*
-                 * A / B / C / D
-                 * keyboard shortcut
-                 */
+                var keyIndex =
 
-                var idx =
-                  e.key.length === 1
-                    ? e.key
+                  event.key.length ===
+                  1
+
+                    ? event.key
                         .toUpperCase()
                         .charCodeAt(0) -
                       65
+
                     : -1;
 
+
                 if (
-                  idx >= 0 &&
-                  idx <
+                  keyIndex >= 0 &&
+                  keyIndex <
                     opts.length
                 ) {
 
-                  e.preventDefault();
+                  event.preventDefault();
 
-                  opts[idx].focus();
+                  opts[
+                    keyIndex
+                  ].focus();
 
-                  opts[idx].click();
+                  opts[
+                    keyIndex
+                  ].click();
+
                 }
+
               }
+
             }
           );
+
         }
       );
+
     }
   );
 
-  /*
-   * Enter key on welcome screen
-   */
 
   document.addEventListener(
     'keydown',
-    function (e) {
+    function (event) {
 
       if (
-        e.key === 'Enter' &&
+        event.key ===
+          'Enter' &&
         cur === -1 &&
-        !els.welcome.hidden &&
-        document.activeElement ===
-          document.body
+        !els.welcome.hidden
       ) {
 
         showStep(
           0,
           'fwd'
         );
+
       }
+
     }
   );
 
-  /*
-   * Initial state
-   */
 
   setProgress(-1);
 
 })();
 </script>
+
+</body>
+</html>
