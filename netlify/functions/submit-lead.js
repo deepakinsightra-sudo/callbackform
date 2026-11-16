@@ -105,7 +105,7 @@ async function saveToGoogleSheet({
       reason: "missing_google_sheet_url",
     });
 
-    return false;
+    return { saved: false, diagnostic: "configuration_missing" };
   }
 
   try {
@@ -156,7 +156,7 @@ async function saveToGoogleSheet({
         }
       );
 
-      return false;
+      return { saved: false, diagnostic: `http_${response.status}` };
     }
 
     if (
@@ -166,14 +166,14 @@ async function saveToGoogleSheet({
         "Sheet fallback rejected by Apps Script"
       );
 
-      return false;
+      return { saved: false, diagnostic: "apps_script_invalid" };
     }
 
     console.info(
       "Sheet fallback succeeded"
     );
 
-    return true;
+    return { saved: true, diagnostic: `http_${response.status}` };
   } catch (error) {
     console.error(
       "Sheet fallback connection failed",
@@ -188,7 +188,7 @@ async function saveToGoogleSheet({
       }
     );
 
-    return false;
+    return { saved: false, diagnostic: error?.name || "fetch_failed" };
   }
 }
 
@@ -365,6 +365,8 @@ export async function handler(event) {
       BROKING;
 
     let crmSaved = false;
+    let crmDiagnostic = "not_attempted";
+    let sheetDiagnostic = "not_attempted";
 
     /*
      * FIRST: TRY CRM
@@ -500,6 +502,7 @@ export async function handler(event) {
         if (
           crmResponse.ok
         ) {
+          crmDiagnostic = `http_${crmResponse.status}`;
           let result =
             {};
 
@@ -547,6 +550,7 @@ export async function handler(event) {
             );
           }
         } else {
+          crmDiagnostic = `http_${crmResponse.status}`;
           console.error(
             "CRM returned error",
             {
@@ -562,6 +566,7 @@ export async function handler(event) {
           );
         }
       } catch (error) {
+        crmDiagnostic = error?.name || "fetch_failed";
         console.error(
           "CRM webhook fetch failed",
           {
@@ -576,6 +581,7 @@ export async function handler(event) {
         );
       }
     } else {
+      crmDiagnostic = "configuration_missing";
       console.error(
         "CRM configuration missing",
         {
@@ -602,7 +608,7 @@ export async function handler(event) {
      * Do not depend on CRM mirroring for callback-form leads.
      */
 
-    const sheetSaved =
+    const sheetResult =
       await saveToGoogleSheet({
         name,
         phone,
@@ -611,6 +617,9 @@ export async function handler(event) {
         leadGrade,
         services,
       });
+
+    const sheetSaved = Boolean(sheetResult?.saved);
+    sheetDiagnostic = sheetResult?.diagnostic || "unknown";
 
     /*
      * Both destinations succeeded.
@@ -691,6 +700,10 @@ export async function handler(event) {
     return reply(502, {
       success: false,
       message: RETRY,
+      diagnostic: {
+        crm: crmDiagnostic,
+        sheet: sheetDiagnostic,
+      },
     });
   } catch (error) {
     console.error(
@@ -709,6 +722,10 @@ export async function handler(event) {
     return reply(502, {
       success: false,
       message: RETRY,
+      diagnostic: {
+        crm: "unexpected_error",
+        sheet: "unexpected_error",
+      },
     });
   }
 }
