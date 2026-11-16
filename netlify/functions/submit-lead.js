@@ -24,6 +24,58 @@ function businessUnitForServices(services, fallback = BROKING) {
   return fallback;
 }
 
+/*
+ * LEAD GRADING
+ *
+ * Income:
+ * ₹0–₹50,000          -> C
+ * ₹50,000–₹1,00,000   -> B
+ * ₹1,00,000–₹5,00,000 -> A
+ * ₹5,00,000+           -> A
+ *
+ * Net Worth:
+ * ₹0–₹50 Lakhs        -> C
+ * ₹50 Lakhs–₹5 Crore  -> B
+ * ₹5 Crore+            -> A
+ *
+ * Final grade = better of income and net worth.
+ */
+
+function getLeadGrade(income, worth) {
+  const rank = {
+    A: 3,
+    B: 2,
+    C: 1,
+  };
+
+  let incomeGrade = "C";
+
+  if (
+    income === "₹1,00,000 to ₹5,00,000" ||
+    income === "₹5,00,000 and more"
+  ) {
+    incomeGrade = "A";
+  } else if (
+    income === "₹50,000 to ₹1,00,000"
+  ) {
+    incomeGrade = "B";
+  }
+
+  let worthGrade = "C";
+
+  if (worth === "₹5 Crore and above") {
+    worthGrade = "A";
+  } else if (
+    worth === "₹50 Lakhs to ₹5 Crore"
+  ) {
+    worthGrade = "B";
+  }
+
+  return rank[incomeGrade] >= rank[worthGrade]
+    ? incomeGrade
+    : worthGrade;
+}
+
 function reply(statusCode, body) {
   return {
     statusCode,
@@ -35,7 +87,13 @@ function reply(statusCode, body) {
   };
 }
 
-async function saveToGoogleSheet({ name, phone, services }) {
+async function saveToGoogleSheet({
+  name,
+  phone,
+  income,
+  worth,
+  services,
+}) {
   const endpoint =
     process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
     process.env.GOOGLE_APPS_SCRIPT_URL;
@@ -57,12 +115,15 @@ async function saveToGoogleSheet({ name, phone, services }) {
       method: "POST",
 
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type":
+          "application/x-www-form-urlencoded",
       },
 
       body: new URLSearchParams({
         name,
         phone,
+        income,
+        worth,
         services,
         "bot-field": "",
       }).toString(),
@@ -72,36 +133,57 @@ async function saveToGoogleSheet({ name, phone, services }) {
       redirect: "follow",
     });
 
-    const body = await response.text().catch(() => "");
+    const body =
+      await response.text().catch(() => "");
 
-    console.info("Google Sheet fallback response", {
-      status: response.status,
-      ok: response.ok,
-      body_preview: body.slice(0, 200),
-    });
+    console.info(
+      "Google Sheet fallback response",
+      {
+        status: response.status,
+        ok: response.ok,
+        body_preview: body.slice(0, 200),
+      }
+    );
 
     if (!response.ok) {
-      console.error("Sheet fallback HTTP error", {
-        status: response.status,
-      });
+      console.error(
+        "Sheet fallback HTTP error",
+        {
+          status: response.status,
+        }
+      );
 
       return false;
     }
 
-    if (body.trim().toLowerCase() === "invalid") {
-      console.error("Sheet fallback rejected by Apps Script");
+    if (
+      body.trim().toLowerCase() === "invalid"
+    ) {
+      console.error(
+        "Sheet fallback rejected by Apps Script"
+      );
 
       return false;
     }
 
-    console.info("Sheet fallback succeeded");
+    console.info(
+      "Sheet fallback succeeded"
+    );
 
     return true;
   } catch (error) {
-    console.error("Sheet fallback connection failed", {
-      name: error?.name || "UnknownError",
-      message: error?.message || "Unknown error",
-    });
+    console.error(
+      "Sheet fallback connection failed",
+      {
+        name:
+          error?.name ||
+          "UnknownError",
+
+        message:
+          error?.message ||
+          "Unknown error",
+      }
+    );
 
     return false;
   }
@@ -116,12 +198,20 @@ export async function handler(event) {
   }
 
   try {
-    const contentType = Object.entries(event.headers || {}).find(
-      ([key]) => key.toLowerCase() === "content-type"
-    )?.[1];
+    const contentType =
+      Object.entries(
+        event.headers || {}
+      ).find(
+        ([key]) =>
+          key.toLowerCase() ===
+          "content-type"
+      )?.[1];
 
     if (
-      contentType?.split(";")[0]?.trim()?.toLowerCase() !==
+      contentType
+        ?.split(";")[0]
+        ?.trim()
+        ?.toLowerCase() !==
       "application/json"
     ) {
       return reply(415, {
@@ -130,9 +220,13 @@ export async function handler(event) {
       });
     }
 
-    const body = event.isBase64Encoded
-      ? Buffer.from(event.body || "", "base64").toString("utf8")
-      : event.body || "";
+    const body =
+      event.isBase64Encoded
+        ? Buffer.from(
+            event.body || "",
+            "base64"
+          ).toString("utf8")
+        : event.body || "";
 
     let input;
 
@@ -145,7 +239,11 @@ export async function handler(event) {
       });
     }
 
-    if (!input || typeof input !== "object" || Array.isArray(input)) {
+    if (
+      !input ||
+      typeof input !== "object" ||
+      Array.isArray(input)
+    ) {
       return reply(400, {
         success: false,
         message: RETRY,
@@ -155,7 +253,8 @@ export async function handler(event) {
     if (input["bot-field"]) {
       return reply(200, {
         success: true,
-        message: "Your response has been sent.",
+        message:
+          "Your response has been sent.",
       });
     }
 
@@ -169,6 +268,16 @@ export async function handler(event) {
         ? input.phone.trim()
         : "";
 
+    const income =
+      typeof input.income === "string"
+        ? input.income.trim()
+        : "";
+
+    const worth =
+      typeof input.worth === "string"
+        ? input.worth.trim()
+        : "";
+
     const services =
       typeof input.services === "string"
         ? input.services.trim()
@@ -176,48 +285,70 @@ export async function handler(event) {
 
     if (
       name.length < 2 ||
+      !income ||
+      !worth ||
       services.length < 3
     ) {
       return reply(400, {
         success: false,
         message:
-          "Please check your name and service details and try again.",
+          "Please check all form details and try again.",
       });
     }
 
-    let digits = phone.replace(/\D/g, "");
+    let digits =
+      phone.replace(/\D/g, "");
 
-    if (digits.startsWith("00")) {
-      digits = digits.slice(2);
+    if (
+      digits.startsWith("00")
+    ) {
+      digits =
+        digits.slice(2);
     }
 
     if (
       digits.length === 13 &&
       digits.startsWith("910")
     ) {
-      digits = digits.slice(3);
+      digits =
+        digits.slice(3);
     }
 
     if (
       digits.length === 12 &&
       digits.startsWith("91")
     ) {
-      digits = digits.slice(2);
+      digits =
+        digits.slice(2);
     }
 
     if (
       digits.length === 11 &&
       digits.startsWith("0")
     ) {
-      digits = digits.slice(1);
+      digits =
+        digits.slice(1);
     }
 
-    if (!/^\d{10,15}$/.test(digits)) {
+    if (
+      !/^\d{10,15}$/.test(digits)
+    ) {
       return reply(400, {
         success: false,
-        message: "Please enter a valid phone number.",
+        message:
+          "Please enter a valid phone number.",
       });
     }
+
+    /*
+     * Calculate A/B/C lead grade
+     */
+
+    const leadGrade =
+      getLeadGrade(
+        income,
+        worth
+      );
 
     const crmEndpoint =
       process.env.CRM_WEBHOOK_URL;
@@ -226,7 +357,8 @@ export async function handler(event) {
       process.env.CRM_WEBHOOK_SECRET;
 
     const fallbackBusinessUnit =
-      process.env.CALLBACK_DEFAULT_BUSINESS_UNIT ||
+      process.env
+        .CALLBACK_DEFAULT_BUSINESS_UNIT ||
       BROKING;
 
     let crmSaved = false;
@@ -235,23 +367,40 @@ export async function handler(event) {
      * FIRST: TRY CRM
      */
 
-    if (crmEndpoint && crmSecret) {
+    if (
+      crmEndpoint &&
+      crmSecret
+    ) {
       try {
-        console.info("CRM webhook attempt", {
-          endpoint_present: true,
-          secret_present: true,
-          business_unit: businessUnitForServices(
-            services,
-            fallbackBusinessUnit
-          ),
-        });
+        console.info(
+          "CRM webhook attempt",
+          {
+            endpoint_present:
+              true,
+
+            secret_present:
+              true,
+
+            business_unit:
+              businessUnitForServices(
+                services,
+                fallbackBusinessUnit
+              ),
+
+            lead_grade:
+              leadGrade,
+          }
+        );
 
         const payload = {
-          full_name: name,
+          full_name:
+            name,
 
-          mobile: phone,
+          mobile:
+            phone,
 
-          email: null,
+          email:
+            null,
 
           business_unit:
             businessUnitForServices(
@@ -259,95 +408,173 @@ export async function handler(event) {
               fallbackBusinessUnit
             ),
 
-          source: "Callback Form",
+          source:
+            "Callback Form",
 
-          campaign_name: null,
+          campaign_name:
+            null,
 
-          product_interest: services,
+          product_interest:
+            services,
 
-          lead_grade: leadGrade,
+          lead_grade:
+            leadGrade,
 
-4.,
-
-          notes: null,
+          notes:
+            `Monthly Income: ${income}\nNet Worth: ${worth}`,
         };
 
-        const crmResponse = await fetch(crmEndpoint, {
-          method: "POST",
+        const crmResponse =
+          await fetch(
+            crmEndpoint,
+            {
+              method:
+                "POST",
 
-          headers: {
-            "Content-Type": "application/json",
+              headers: {
+                "Content-Type":
+                  "application/json",
 
-            "x-webhook-secret": crmSecret,
-          },
+                "x-webhook-secret":
+                  crmSecret,
+              },
 
-          body: JSON.stringify(payload),
+              body:
+                JSON.stringify(
+                  payload
+                ),
 
-          signal: AbortSignal.timeout(15000),
+              signal:
+                AbortSignal.timeout(
+                  15000
+                ),
 
-          redirect: "follow",
-        });
+              redirect:
+                "follow",
+            }
+          );
 
         const crmBody =
-          await crmResponse.text().catch(() => "");
+          await crmResponse
+            .text()
+            .catch(
+              () => ""
+            );
 
-        console.info("CRM webhook response", {
-          status: crmResponse.status,
-          ok: crmResponse.ok,
-          body_preview: crmBody.slice(0, 300),
-        });
+        console.info(
+          "CRM webhook response",
+          {
+            status:
+              crmResponse.status,
 
-        if (crmResponse.ok) {
-          let result = {};
+            ok:
+              crmResponse.ok,
+
+            body_preview:
+              crmBody.slice(
+                0,
+                300
+              ),
+          }
+        );
+
+        if (
+          crmResponse.ok
+        ) {
+          let result =
+            {};
 
           try {
-            result = JSON.parse(crmBody);
+            result =
+              JSON.parse(
+                crmBody
+              );
           } catch {
-            result = {};
+            result =
+              {};
           }
 
           if (
-            ["created", "duplicate"].includes(
+            [
+              "created",
+              "duplicate",
+            ].includes(
               result?.status
             )
           ) {
-            crmSaved = true;
+            crmSaved =
+              true;
 
-            console.info("CRM lead accepted", {
-              status: result.status,
-            });
+            console.info(
+              "CRM lead accepted",
+              {
+                status:
+                  result.status,
+              }
+            );
           } else {
-            console.error("CRM response invalid", {
-              status: crmResponse.status,
-              body_preview: crmBody.slice(0, 300),
-            });
+            console.error(
+              "CRM response invalid",
+              {
+                status:
+                  crmResponse.status,
+
+                body_preview:
+                  crmBody.slice(
+                    0,
+                    300
+                  ),
+              }
+            );
           }
         } else {
-          console.error("CRM returned error", {
-            status: crmResponse.status,
-            body_preview: crmBody.slice(0, 300),
-          });
+          console.error(
+            "CRM returned error",
+            {
+              status:
+                crmResponse.status,
+
+              body_preview:
+                crmBody.slice(
+                  0,
+                  300
+                ),
+            }
+          );
         }
       } catch (error) {
-        console.error("CRM webhook fetch failed", {
-          name: error?.name || "UnknownError",
-          message: error?.message || "Unknown error",
-        });
+        console.error(
+          "CRM webhook fetch failed",
+          {
+            name:
+              error?.name ||
+              "UnknownError",
+
+            message:
+              error?.message ||
+              "Unknown error",
+          }
+        );
       }
     } else {
-      console.error("CRM configuration missing", {
-        endpoint_present: Boolean(crmEndpoint),
-        secret_present: Boolean(crmSecret),
-      });
+      console.error(
+        "CRM configuration missing",
+        {
+          endpoint_present:
+            Boolean(
+              crmEndpoint
+            ),
+
+          secret_present:
+            Boolean(
+              crmSecret
+            ),
+        }
+      );
     }
 
     /*
      * CRM SUCCESS
-     *
-     * CRM itself is responsible for:
-     * Supabase storage
-     * allocation
-     * Google Sheet mirror
      */
 
     if (crmSaved) {
@@ -357,15 +584,17 @@ export async function handler(event) {
         message:
           "Your response has been sent. Our team will get back to you.",
 
-        destination: "crm",
+        destination:
+          "crm",
+
+        lead_grade:
+          leadGrade,
       });
     }
 
     /*
      * CRM FAILED
-     *
-     * FALLBACK:
-     * Save directly to Google Sheet so lead is not lost.
+     * SAVE TO GOOGLE SHEET
      */
 
     console.warn(
@@ -376,14 +605,10 @@ export async function handler(event) {
       await saveToGoogleSheet({
         name,
         phone,
+        income,
+        worth,
         services,
       });
-
-    /*
-     * SHEET SUCCESS
-     *
-     * Lead is preserved even though CRM failed.
-     */
 
     if (sheetSaved) {
       return reply(200, {
@@ -397,10 +622,6 @@ export async function handler(event) {
       });
     }
 
-    /*
-     * BOTH CRM AND SHEET FAILED
-     */
-
     console.error(
       "Lead submission failed in both CRM and Google Sheet"
     );
@@ -410,10 +631,18 @@ export async function handler(event) {
       message: RETRY,
     });
   } catch (error) {
-    console.error("Unexpected callback failure", {
-      name: error?.name || "UnknownError",
-      message: error?.message || "Unknown error",
-    });
+    console.error(
+      "Unexpected callback failure",
+      {
+        name:
+          error?.name ||
+          "UnknownError",
+
+        message:
+          error?.message ||
+          "Unknown error",
+      }
+    );
 
     return reply(502, {
       success: false,
